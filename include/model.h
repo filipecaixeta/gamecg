@@ -19,7 +19,7 @@ public:
 	~Model();
 	void draw(Shader *shader);
 	void processNode(aiNode* node, const aiScene* scene);
-	void processMesh(aiMesh* mesh, const aiScene* scene);
+	void processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node);
 	vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type);
 	GLint TextureFromFile(string filename, string directory);
 	vector<Mesh> meshes;

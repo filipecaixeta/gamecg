@@ -1,11 +1,9 @@
 #include <mesh.h>
+#include <iostream>
 
 Mesh::Mesh(vector<Vertex> vertices,vector<GLuint> indices,vector<Texture> textures)
 :vertices(vertices),indices(indices),textures(textures)
 {
-	glGenVertexArrays(1,&vertexArrayObject);
-	glBindVertexArray(vertexArrayObject);
-
 	glGenBuffers(1, &vertexBufferObject);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(Vertex), 
@@ -16,19 +14,20 @@ Mesh::Mesh(vector<Vertex> vertices,vector<GLuint> indices,vector<Texture> textur
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(GLuint), 
 		&(indices[0]), GL_STATIC_DRAW);
 	
-	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void Mesh::draw(Shader *shader)
 {
-	shader->use(true);
+
 	GLuint program=shader->getProgram();
-	// Vertex Positions
-	GLuint position=glGetAttribLocation(program,"position");
+	
 	glBindBuffer(GL_ARRAY_BUFFER,vertexBufferObject);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,elementBufferObject);
+	
+	// Vertex Positions
+	GLuint position=glGetAttribLocation(program,"position");
     glEnableVertexAttribArray(position);
     glVertexAttribPointer(position, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),(GLvoid*)0);
     // Vertex Normals
@@ -41,6 +40,16 @@ void Mesh::draw(Shader *shader)
 	glEnableVertexAttribArray(texCoords);
 	glVertexAttribPointer(texCoords, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
 		(GLvoid*)offsetof(Vertex, TexCoords));
+	// Vertex Color
+	GLuint color=glGetAttribLocation(program,"color");
+	glEnableVertexAttribArray(color);
+	glVertexAttribPointer(color, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+		(GLvoid*)offsetof(Vertex, Color));
+	// Vertex Tangent
+	GLuint tangent=glGetAttribLocation(program,"tangent");
+	glEnableVertexAttribArray(tangent);
+	glVertexAttribPointer(tangent, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+		(GLvoid*)offsetof(Vertex, Tangent));
 
 	GLuint diffuseNro=1;
 	GLuint specularNro=1;
@@ -59,10 +68,17 @@ void Mesh::draw(Shader *shader)
 		i++;
 	}
 	glActiveTexture(GL_TEXTURE0);
-	glBindVertexArray(vertexArrayObject);
+	
+	material->loadToShader(program);
+
+	glBindVertexArray(vertexBufferObject);
 	glDrawElements(GL_TRIANGLES, indices.size(),GL_UNSIGNED_INT, 0);
 
 	glDisableVertexAttribArray(position);
+	glDisableVertexAttribArray(normal);
+	glDisableVertexAttribArray(texCoords);
+	glDisableVertexAttribArray(color);
+	glDisableVertexAttribArray(tangent);
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
@@ -71,7 +87,6 @@ void Mesh::draw(Shader *shader)
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    shader->use(false);
 }
 
 Mesh::~Mesh()
