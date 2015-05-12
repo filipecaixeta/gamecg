@@ -2,8 +2,12 @@
 
 struct materialT
 {
-    vec4 texture_difuse0;
-    vec4 texture_specular0;
+    sampler2D texture_difuse0;
+    sampler2D texture_specular0;
+    sampler2D texture_difuse1;
+    sampler2D texture_specular1;
+    sampler2D texture_difuse2;
+    sampler2D texture_specular2;
     vec4 color_diffuse;
     vec4 color_specular;
     vec4 color_ambient;
@@ -68,6 +72,16 @@ void main()
 
     // write Total Color:  
     vec4 c=material.color_ambient+Iamb+Idiff+Ispec;
-    gl_FragColor = clamp(material.color_diffuse*c, 0.0, 1.0);   
+    vec4 color = texture2D(texUnit, TexCoord);
+    if (color.xyz==vec3(0.0,0.0,0.0))
+    {
+        gl_FragColor = clamp(material.color_diffuse*c, 0.0, 1.0);
+    }
+    else
+    {
+        gl_FragColor = color + material.color_ambient;
+        // gl_FragColor = color;
+    }
+    gl_FragColor.a=material.color_transparent.a;
 
 }

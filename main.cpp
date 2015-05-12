@@ -43,7 +43,7 @@ void displayWin()
 	);
 	glm::mat4 Model = glm::scale(glm::mat4(1.0f),glm::vec3(2.0f)); 
 	// Model = glm::translate(Model,glm::vec3(0,-10,0));
-	// Model = glm::rotate(Model,360.0f,glm::vec3(1.0,0.0,0.0));
+	// Model = glm::rotate(Model,90.0f,glm::vec3(1.0,0.0,0.0));
 	Model = glm::rotate(Model,ang,glm::vec3(0.0,1.0,0.0));
 	ang+=0.01;
 
@@ -57,9 +57,9 @@ void displayWin()
 		, 1, GL_FALSE, &Model[0][0]);
 
 	glm::vec4 Lpos(0.0f,5.0f,10.0f,0.0f);
-	glm::vec4 ambient(0.0f,0.0f,0.0f,1.0f);
-	glm::vec4 diffuse(0.5f,0.5f,0.5f,1.0f);
-	glm::vec4 specular(0.5f,0.5f,0.5f,1.0f);
+	glm::vec4 ambient(0.3f,0.3f,0.3f,1.0f);
+	glm::vec4 diffuse(0.8f,0.8f,0.8f,1.0f);
+	glm::vec4 specular(0.9f,0.9f,0.9f,1.0f);
 
 	glUniform4fv(glGetUniformLocation(program, "lightS.position"), 1, &Lpos[0]);
 	glUniform4fv(glGetUniformLocation(program, "lightS.ambient"), 1, &ambient[0]);
@@ -80,7 +80,7 @@ void init()
     {
     	std::cout << "Mesh: \t";
     	for(auto& mesh: m.second->meshes)
-    		std::cout <<mesh.meshName << " , ";
+    		std::cout << mesh.meshName << " , ";
     	std::cout << std::endl;
     }
 }
@@ -97,6 +97,8 @@ int main(int argc, char *argv[])
  	glutCreateWindow(windowName);
  	
  	glEnable(GL_DEPTH_TEST); 
+ 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     GLenum err = glewInit();
     if (err != GLEW_OK)

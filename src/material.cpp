@@ -18,7 +18,7 @@ Material::Material(aiMaterial* mat)
 	aiColor4D _color_specular(0.f,0.f,0.f,0.0f);
 	aiColor4D _color_ambient(0.f,0.f,0.f,0.0f);
 	aiColor4D _color_emissive(0.f,0.f,0.f,0.0f);
-	aiColor4D _color_transparent(0.f,0.f,0.f,0.0f);
+	aiColor4D _color_transparent(1.f,1.f,1.f,1.0f);
 	float _opacity=1.0f;
 	float _shininess=0.0f;
     aiGetMaterialColor(mat,AI_MATKEY_COLOR_DIFFUSE,&_color_diffuse);

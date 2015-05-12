@@ -67,7 +67,7 @@ void Mesh::draw(Shader *shader)
 		glBindTexture(GL_TEXTURE_2D, texture.id);
 		i++;
 	}
-	glActiveTexture(GL_TEXTURE0);
+	// glActiveTexture(GL_TEXTURE0);
 	
 	material->loadToShader(program);
 
