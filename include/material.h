@@ -23,6 +23,7 @@ public:
 	void loadToShader(GLuint program);
 	void print();
 	~Material();
+	std::string name;
 	vec4 color_diffuse;
 	vec4 color_specular;
 	vec4 color_ambient;

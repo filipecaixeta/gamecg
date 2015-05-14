@@ -103,14 +103,9 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node)
             indices.push_back(face.mIndices[j]);
     }
 
-    // std::cout << "mMaterialIndex" << mesh->mMaterialIndex << std::endl;
-
     if((signed)mesh->mMaterialIndex >= 0)
     {
         aiMaterial* _material = scene->mMaterials[mesh->mMaterialIndex];
-
-        // std::cout << "text = " << node->GetTextureCount() << std::endl;
-
         // 1. Diffuse maps
         vector<Texture> diffuseMaps = loadMaterialTextures(_material, aiTextureType_DIFFUSE);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -120,27 +115,16 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node)
         // std::cout << "size 1 = " << diffuseMaps.size() << std::endl;
         // std::cout << "size 2 = " << specularMaps.size() << std::endl;
     }
-    // std::cout << "size 3 = " << textures.size() << std::endl;   
-    // if (textures.size()!=0)
-    //     return;
+
     Mesh tempMesh=Mesh(vertices, indices, textures);
     tempMesh.meshName=node->mName.C_Str();
     if((signed)mesh->mMaterialIndex >= 0)
     {
         tempMesh.material=new Material(scene->mMaterials[mesh->mMaterialIndex]);
-        if  (tempMesh.meshName.find("Wind") == 0)
-            tempMesh.material->color_transparent=vec4(1.0f,1.0f,1.0f,0.5f);
-            // return;
         std::cout << tempMesh.meshName << std::endl;
         tempMesh.material->print();
     }
-    
-    // printf("%f\t%f\t%f\t%f\n",t.a1,t.a2,t.a3,t.a4);
-    // printf("%f\t%f\t%f\t%f\n",t.b1,t.b2,t.b3,t.b4);
-    // printf("%f\t%f\t%f\t%f\n",t.c1,t.c2,t.c3,t.c4);
-    // printf("%f\t%f\t%f\t%f\n",t.d1,t.d2,t.d3,t.d4);
 
-    // std::cout << std::endl;
     meshes.push_back(tempMesh);
 }
 
@@ -173,16 +157,11 @@ GLint Model::TextureFromFile(string filename, string directory)
     // Assign texture to ID
     glBindTexture(GL_TEXTURE_2D, textureID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-    // glGenerateMipmap(GL_TEXTURE_2D);	
 
     // Parameters
-    // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-    // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-    // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
-    // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    
+
     glBindTexture(GL_TEXTURE_2D, 0);
     return textureID;
 }

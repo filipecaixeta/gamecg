@@ -19,69 +19,60 @@ struct materialT
 
 struct lightSourceT
 {   
-   vec4 ambient;              // Aclarri   
-   vec4 diffuse;              // Dcli   
-   vec4 specular;             // Scli   
-   vec4 position;             // Ppli   
+   vec4 ambient;
+   vec4 diffuse;
+   vec4 specular;
+   vec4 position;
 }; 
 
 uniform materialT material;
 uniform lightSourceT lightS;
-uniform sampler2D texUnit;
- 
+uniform vec3 eyePos;
+uniform int useTexture;
+
 varying vec3 Normal;
 varying vec2 TexCoord;
 varying vec3 Color;
 varying vec3 VPos;
 
-void main()
+vec4 light0()
 {
-    // vec4 color=vec4(Color,1.0);
-    // vec4 amb=vec4(0.2f, 0.2f, 0.8f, 1.0f);
-    // float intensity;
-    // vec3 lightDir;
-    // vec3 n;
- 
-    // lightDir = normalize(vec3(1.0,1.0,1.0));
-    // n = normalize(Normal);
-    // intensity = max(dot(lightDir,n),0.0);
- 
-    // // color = texture2D(texUnit, TexCoord);
-    // gl_FragColor = vec4(material.color_specular,1.0f);
-    // // amb = color;
-    // // gl_FragColor = (color * intensity) + amb;
-
-    // // gl_FragColor = intensity + amb;
-
-    vec3 L = normalize(lightS.position.xyz-VPos);   
-    vec3 E = normalize(-VPos); // we are in Eye Coordinates, so EyePos is (0,0,0)  
-    vec3 R = normalize(-reflect(L,Normal));  
-
-    //calculate Ambient Term:  
-    vec4 Iamb = lightS.ambient;    
-
-    //calculate Diffuse Term:  
-    vec4 Idiff = lightS.diffuse * max(dot(Normal,L), 0.0);
-    Idiff = clamp(Idiff, 0.0, 1.0);     
-
-    // calculate Specular Term:
-    vec4 Ispec = lightS.specular*pow(max(dot(R,E),0.0),material.shininess);
-    Ispec = clamp(Ispec, 0.0, 1.0); 
-
-    vec4 sceneColor=vec4(0.1,0.1,0.1,1);
-
-    // write Total Color:  
-    vec4 c=material.color_ambient+Iamb+Idiff+Ispec;
-    vec4 color = texture2D(texUnit, TexCoord);
-    if (color.xyz==vec3(0.0,0.0,0.0))
+    // lightS.position.y=lightS.position.y;
+    vec4 color_diffuse;
+    if (useTexture==1)
     {
-        gl_FragColor = clamp(material.color_diffuse*c, 0.0, 1.0);
+        color_diffuse=texture2D(material.texture_difuse0, TexCoord);
     }
     else
     {
-        gl_FragColor = color + material.color_ambient;
-        // gl_FragColor = color;
+        color_diffuse=material.color_diffuse;
     }
-    gl_FragColor.a=material.color_transparent.a;
 
+    vec3 L = normalize(lightS.position.xyz-VPos+vec3(0.0,2,0.0));   
+    vec3 E = normalize(eyePos-VPos);
+    vec3 R = normalize(-reflect(L,Normal));  
+
+    float dist = length(L);
+
+    //calculate Ambient Term:  
+    vec4 Iamb = lightS.ambient*color_diffuse;    
+
+    //calculate Diffuse Term:  
+    vec4 Idiff = lightS.diffuse*2* max(dot(Normal,L), 0.0)*color_diffuse;
+    Idiff = clamp(Idiff, 0.0, 1.0);
+
+    // calculate Specular Term:
+    vec4 Ispec = lightS.specular*pow(max(dot(R,E),0.0),0.3*material.shininess);
+    Ispec = clamp(Ispec, 0.0, 1.0); 
+
+    // write Total Color:
+    vec4 color = material.color_emissive*0.5+Iamb+(material.color_ambient + Idiff + Ispec);
+    color.rgb = clamp(color.rgb,0.0,1.0);
+    color.a = material.color_transparent.a;
+    return color;
+}
+
+void main()
+{
+    gl_FragColor = light0();
 }

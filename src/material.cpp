@@ -21,6 +21,8 @@ Material::Material(aiMaterial* mat)
 	aiColor4D _color_transparent(1.f,1.f,1.f,1.0f);
 	float _opacity=1.0f;
 	float _shininess=0.0f;
+	aiString _name;
+	
     aiGetMaterialColor(mat,AI_MATKEY_COLOR_DIFFUSE,&_color_diffuse);
     aiGetMaterialColor(mat,AI_MATKEY_COLOR_SPECULAR,&_color_specular);
     aiGetMaterialColor(mat,AI_MATKEY_COLOR_AMBIENT,&_color_ambient);
@@ -28,6 +30,8 @@ Material::Material(aiMaterial* mat)
     aiGetMaterialColor(mat,AI_MATKEY_COLOR_TRANSPARENT,&_color_transparent);
     aiGetMaterialFloat(mat,AI_MATKEY_OPACITY,&_opacity);
     aiGetMaterialFloat(mat,AI_MATKEY_SHININESS,&_shininess);
+    aiGetMaterialString(mat,AI_MATKEY_NAME,&_name);
+    name=_name.C_Str();
 
 	color_diffuse=vec4(_color_diffuse.r,_color_diffuse.g,_color_diffuse.b,_color_diffuse.a);
 	color_specular=vec4(_color_specular.r,_color_specular.g,_color_specular.b,_color_specular.a);
@@ -36,6 +40,8 @@ Material::Material(aiMaterial* mat)
 	color_transparent=vec4(_color_transparent.r,_color_transparent.g,_color_transparent.b,_color_transparent.a);
 	opacity=_opacity;
 	shininess=_shininess;
+
+
 }
 void Material::print()
 {
