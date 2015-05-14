@@ -36,6 +36,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${ASSIMP_INCLUDE_DIRS})
 # ASSIMP_LIBRARY_DIRS - link directories
 # ASSIMP_LIBRARIES - libraries to link plugins with
 
+find_library(ASSIMP2 assimp /usr/local/lib/libassimp)
+
 set(SOURCES 
 	src/model.cpp
 	src/mesh.cpp
@@ -46,4 +48,4 @@ set(SOURCES
 
 add_executable(main main.cpp ${SOURCES})
 
-target_link_libraries( main ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${ASSIMP_LIBRARY} assimp)
+target_link_libraries( main ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} ${GLEW_LIBRARIES} ${ASSIMP_LIBRARY} ${ASSIMP2} assimp)
