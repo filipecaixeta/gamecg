@@ -30,6 +30,7 @@ void init();
 // GLOBAL VARIABLES
 std::map<std::string,Shader*> shaders;
 std::map<std::string,Car*> cars;
+float aspect=1;
 float ang=0;
 
 void displayWin()
@@ -38,7 +39,7 @@ void displayWin()
 	shaders["car"]->reloadShader();
 	shaders["car"]->use(true);
 	vec3 eyePos=vec3(0,5,10);
-	glm::mat4 Projection = glm::perspective(45.0f, 720.0f/480.0f, 0.1f, 100.0f);
+	glm::mat4 Projection = glm::perspective(45.0f, aspect, 0.1f, 100.0f);
 	glm::mat4 View       = glm::lookAt(
 	    eyePos,				// Camera is at (,,), in World Space
 	    glm::vec3(0,0,0), 	// and looks at the origin
@@ -90,7 +91,7 @@ void init()
 {
 	shaders["car"]=new Shader(baseDir+"shaders/shader.vs", baseDir+"shaders/shader.frag");
     cars["camaro"]=new Car(baseDir+"3dModels/car9/car.obj");
-    cars["camaro"]->setColor(vec4(1.0,0.0,0.0,1.0));
+    cars["camaro"]->setColor(vec4(0.67,0.48,0.0,1.0));
     for (auto& m: cars)
     {
     	std::cout << "Mesh: \t";
@@ -104,6 +105,7 @@ int main(int argc, char *argv[])
 {
 	int wWidth=720;
 	int wHeight=480;
+	aspect=(float)wWidth/(float)wHeight;
 	const char windowName[]="window";
 	glutInit(&argc, argv);
     glutInitWindowSize(wWidth,wHeight);
@@ -139,6 +141,7 @@ void clear(float r,float g, float b, float a)
 
 void reshapeWin(int wWidth, int wHeight) 
 {
+	aspect=(float)wWidth/(float)wHeight;
 	glViewport( 0, 0, wWidth, wHeight );
 	glutPostRedisplay();
 }

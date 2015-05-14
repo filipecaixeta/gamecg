@@ -70,7 +70,7 @@ void Mesh::draw(Shader *shader)
 
 
 	material->loadToShader(program);
-	glUniform1f(glGetUniformLocation(program,"useTexture"), textures.size());
+	glUniform1i(glGetUniformLocation(program,"useTexture"), textures.size());
 
 	glBindVertexArray(vertexBufferObject);
 	glDrawElements(GL_TRIANGLES, indices.size(),GL_UNSIGNED_INT, 0);
