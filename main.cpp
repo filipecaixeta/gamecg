@@ -160,8 +160,10 @@ int main(int argc, char *argv[])
  	glutCreateWindow(windowName);
  	
  	glEnable(GL_DEPTH_TEST); 
- 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+ 	// glEnable(GL_BLEND);
+ 	glAlphaFunc ( GL_GREATER, 0.5 ) ;
+ 	glEnable ( GL_ALPHA_TEST ) ;
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     GLenum err = glewInit();
     if (err != GLEW_OK)

@@ -121,6 +121,8 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node)
     if((signed)mesh->mMaterialIndex >= 0)
     {
         tempMesh.material=new Material(scene->mMaterials[mesh->mMaterialIndex]);
+        // if (tempMesh.meshName.find("glass")==0)
+        //     return;
         // std::cout << tempMesh.meshName << std::endl;
         // tempMesh.material->print();
     }
