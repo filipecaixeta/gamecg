@@ -1,0 +1,156 @@
+newmtl default
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/na1.jpg
+
+newmtl default_sidewalk_1
+d 1
+Ns 0.75
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/dvc1.jpg
+
+newmtl default_house_basemult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/df2.jpg
+
+newmtl default_house_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/dr1.jpg
+
+newmtl default_chimney_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/ch2.jpg
+
+newmtl default_windows_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/wd1.jpg
+
+newmtl default_roof_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/rf2b.jpg
+
+newmtl default_extras_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/w5.jpg
+
+newmtl default_wall_front_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/wf1c.jpg
+
+newmtl default_wall_side_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/wm3d.jpg
+
+newmtl default_light_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 1 1
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+
+newmtl default_lamp_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 0.156863 0.14902 0.176471
+Ks 1 1 1
+Km 0
+
+newmtl default_transformer
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 0 0 0
+Ks 1 1 1
+Km 0
+
+newmtl default_transformer_transformer
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 1 1 1
+Ks 1 1 1
+Km 0
+map_Kd /Maps/dvc1.jpg
+
+newmtl default_electric_pole_mult
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 0.286275 0.282353 0.254902
+Ks 1 1 1
+Km 0
+map_Kd /Maps/dk1.jpg
+
+newmtl default_electrical_wire
+d 1
+Ns 1
+Ni 0
+Ka 0 0 0
+Kd 0 0 0
+Ks 1 1 1
+Km 0
+

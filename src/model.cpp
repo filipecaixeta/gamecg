@@ -121,8 +121,8 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node)
     if((signed)mesh->mMaterialIndex >= 0)
     {
         tempMesh.material=new Material(scene->mMaterials[mesh->mMaterialIndex]);
-        std::cout << tempMesh.meshName << std::endl;
-        tempMesh.material->print();
+        // std::cout << tempMesh.meshName << std::endl;
+        // tempMesh.material->print();
     }
 
     meshes.push_back(tempMesh);

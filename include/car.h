@@ -22,6 +22,7 @@ public:
 	void draw(Shader *shader);
 // private:
 	Model model;
+	mat4 modelMatrix;
 };
 
 #endif

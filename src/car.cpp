@@ -5,7 +5,7 @@ Car::Car(string path):model(path)
 	for(auto& mesh: model.meshes)
 	{
 		if (mesh.material->name.find("Glass")==0)
-			mesh.material->color_transparent=vec4(1.0f,1.0f,1.0f,0.6f);
+			mesh.material->color_transparent=vec4(1.0f,1.0f,1.0f,0.1f);
 		else if (mesh.material->name.find("BreakLight")==0)
 			mesh.material->color_emissive=vec4(1.0f,0.0f,0.0f,1.0f);
 	}

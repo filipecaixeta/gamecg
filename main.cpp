@@ -16,6 +16,7 @@
 #include <shader.h>
 #include <mesh.h>
 #include <car.h>
+#include <scenario.h>
 
 const std::string baseDir="../";
 using namespace glm;
@@ -30,6 +31,7 @@ void init();
 // GLOBAL VARIABLES
 std::map<std::string,Shader*> shaders;
 std::map<std::string,Car*> cars;
+Scenario *scenario;
 float aspect=1;
 float ang=0;
 
@@ -37,7 +39,8 @@ void displayWin()
 {
 	clear(0.22,0.22,0.22,1.0);
 	shaders["car"]->reloadShader();
-	shaders["car"]->use(true);
+	shaders["scenario"]->reloadShader();
+
 	vec3 eyePos=vec3(0,5,10);
 	glm::mat4 Projection = glm::perspective(45.0f, aspect, 0.1f, 100.0f);
 	glm::mat4 View       = glm::lookAt(
@@ -45,13 +48,28 @@ void displayWin()
 	    glm::vec3(0,0,0), 	// and looks at the origin
 	    glm::vec3(0,1,0)  	// Head is up (set to 0,-1,0 to look upside-down)
 	);
-	glm::mat4 Model = glm::scale(glm::mat4(1.0f),glm::vec3(2.5f)); 
-	// Model = glm::translate(Model,glm::vec3(0,-10,0));
-	// Model = glm::rotate(Model,90.0f,glm::vec3(1.0,0.0,0.0));
-	Model = glm::rotate(Model,ang,glm::vec3(0.0,1.0,0.0));
-	ang+=0.01;
+	glm::mat4 Model;
 
+	glm::vec4 Lpos(0.0f,2.0f,10.0f,0.0f);
+	glm::vec4 ambient(0.6f,0.6f,0.6f,1.0f);
+	glm::vec4 diffuse(0.3f,0.3f,0.3f,1.0f);
+	glm::vec4 specular(0.7f,0.7f,0.7f,1.0f);
+
+	//=======================================================//
+
+	shaders["car"]->use(true);
 	GLuint program=shaders["car"]->getProgram();
+
+	glUniform4fv(glGetUniformLocation(program, "lightS.position"), 1, &Lpos[0]);
+	glUniform4fv(glGetUniformLocation(program, "lightS.ambient"), 1, &ambient[0]);
+	glUniform4fv(glGetUniformLocation(program, "lightS.diffuse"), 1, &diffuse[0]);
+	glUniform4fv(glGetUniformLocation(program, "lightS.specular"), 1, &specular[0]);
+	glUniform3fv(glGetUniformLocation(program, "eyePos"), 1, &eyePos[0]);
+
+	Model = cars["car1"]->modelMatrix;
+	// Model = glm::translate(Model,glm::vec3(0.0,0.0,ang)); 
+	Model = glm::rotate(Model,ang,glm::vec3(0.0,1.0,0.0));
+	ang+=0.003;
 
 	glUniformMatrix4fv(glGetUniformLocation(program, "Projection")
 		, 1, GL_FALSE, &Projection[0][0]);
@@ -60,10 +78,12 @@ void displayWin()
 	glUniformMatrix4fv(glGetUniformLocation(program, "Model")
 		, 1, GL_FALSE, &Model[0][0]);
 
-	glm::vec4 Lpos(0.0f,2.0f,10.0f,0.0f);
-	glm::vec4 ambient(0.3f,0.3f,0.3f,1.0f);
-	glm::vec4 diffuse(0.3f,0.3f,0.3f,1.0f);
-	glm::vec4 specular(0.7f,0.7f,0.7f,1.0f);
+    cars["car1"]->draw(shaders["car"]);
+
+    //=========================================//
+
+    shaders["scenario"]->use(true);
+	program=shaders["scenario"]->getProgram();
 
 	glUniform4fv(glGetUniformLocation(program, "lightS.position"), 1, &Lpos[0]);
 	glUniform4fv(glGetUniformLocation(program, "lightS.ambient"), 1, &ambient[0]);
@@ -71,15 +91,28 @@ void displayWin()
 	glUniform4fv(glGetUniformLocation(program, "lightS.specular"), 1, &specular[0]);
 	glUniform3fv(glGetUniformLocation(program, "eyePos"), 1, &eyePos[0]);
 
-    cars["camaro"]->draw(shaders["car"]);
+	Model = scenario->modelMatrix;
+	Model = glm::rotate(Model,ang,glm::vec3(0.0,1.0,0.0));
+	// ang+=0.003;
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "Projection")
+		, 1, GL_FALSE, &Projection[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "View")
+		, 1, GL_FALSE, &View[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(program, "Model")
+		, 1, GL_FALSE, &Model[0][0]);
+
+    scenario->draw(shaders["scenario"]);
+
+    //=========================================//
 
     static float lastTime=std::clock();
     static int frameN=0;
     frameN++;
-    if (frameN%10==0)
+    if (frameN%50==0)
     {
 
-    	float temp=(std::clock()-lastTime)/10.0/(double)CLOCKS_PER_SEC*1000;
+    	float temp=(std::clock()-lastTime)/50.0/(double)CLOCKS_PER_SEC*1000;
     	std::cout << "Time per Frame = " << temp << std::endl;
     	lastTime=std::clock();
     }
@@ -89,9 +122,22 @@ void displayWin()
 
 void init()
 {
-	shaders["car"]=new Shader(baseDir+"shaders/shader.vs", baseDir+"shaders/shader.frag");
-    cars["camaro"]=new Car(baseDir+"3dModels/car9/car.obj");
-    cars["camaro"]->setColor(vec4(0.67,0.48,0.0,1.0));
+	// Shader for all the cars
+	shaders["car"]=new Shader(baseDir+"shaders/car.vs", baseDir+"shaders/car.frag");
+	// Shader for the scenario
+	shaders["scenario"]=new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
+
+	// Load the scenario mesh
+	scenario=new Scenario(baseDir+"3dModels/city3/city.obj");
+	scenario->modelMatrix = glm::scale(glm::mat4(1.0f),glm::vec3(1.0f)); 
+
+	// Load one car mesh
+    cars["car1"]=new Car(baseDir+"3dModels/car9/car.obj");
+    cars["car1"]->setColor(vec4(0.67,0.48,0.0,1.0));
+    cars["car1"]->modelMatrix = glm::scale(glm::mat4(1.0f),glm::vec3(2.0f)); 
+    cars["car1"]->modelMatrix = glm::rotate((cars["car1"]->modelMatrix),80.0f,glm::vec3(0.0f,1.0f,0.0f));
+
+
     for (auto& m: cars)
     {
     	std::cout << "Mesh: \t";
@@ -130,7 +176,7 @@ int main(int argc, char *argv[])
 	glutKeyboardFunc(keyBorardFunc);
     glutMainLoop();
 
-return 0;
+	return 0;
 }
 
 void clear(float r,float g, float b, float a)
