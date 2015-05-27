@@ -42,6 +42,10 @@ vec4 light0()
     if (useTexture==1)
     {
         color_diffuse=texture2D(material.texture_difuse0, TexCoord);
+        float a=color_diffuse.a;
+        if (a<1.0)
+            discard;
+        color_diffuse=a*color_diffuse+(1.0-a)*material.color_diffuse;
     }
     else
     {

@@ -12,6 +12,7 @@
 using std::vector;
 using std::string;
 using glm::mat4;
+using glm::vec3;
 
 class Mesh
 {
@@ -25,6 +26,7 @@ class Mesh
 		string meshName;
 		mat4 transformation;
 		Material *material;
+		vec3 center;
 	private:
 		GLuint vertexArrayObject;
 		GLuint vertexBufferObject;

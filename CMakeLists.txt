@@ -45,6 +45,9 @@ set(SOURCES
 	src/material.cpp
 	src/car.cpp
 	src/scenario.cpp
+	include/kdtree.hpp
+	src/camera.cpp
+	src/light.cpp
 	src/stb_image.c)
 
 add_executable(main main.cpp ${SOURCES})

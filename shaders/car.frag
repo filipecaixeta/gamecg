@@ -50,17 +50,17 @@ vec4 light0()
         color_diffuse=material.color_diffuse;
     }
 
-    vec3 L = normalize(lightS.position.xyz-VPos+vec3(0.0,2,0.0));   
+    vec3 L = normalize(lightS.position.xyz-VPos+vec3(0.0,2,0.0))*100;   
     vec3 E = normalize(eyePos-VPos);
     vec3 R = normalize(-reflect(L,Normal));  
 
     float dist = length(L);
 
     //calculate Ambient Term:  
-    vec4 Iamb = lightS.ambient*color_diffuse;    
+    vec4 Iamb = 1.5*lightS.ambient*color_diffuse;    
 
     //calculate Diffuse Term:  
-    vec4 Idiff = lightS.diffuse*2* max(dot(Normal,L), 0.0)*color_diffuse;
+    vec4 Idiff = lightS.diffuse*max(dot(Normal,L), 0.0)*color_diffuse;
     Idiff = clamp(Idiff, 0.0, 1.0);
 
     // calculate Specular Term:

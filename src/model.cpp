@@ -47,11 +47,13 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node)
     {
         Vertex vertex;
         vec3 vecTemp;
+        vec4 vecTemp4;
 
-        vecTemp.x = mesh->mVertices[i].x;
-        vecTemp.y = mesh->mVertices[i].y;
-        vecTemp.z = mesh->mVertices[i].z;
-        vertex.Position = vecTemp;
+        vecTemp4.x = mesh->mVertices[i].x;
+        vecTemp4.y = mesh->mVertices[i].y;
+        vecTemp4.z = mesh->mVertices[i].z;
+        vec4 temp=tr*vecTemp4;
+        vertex.Position = vec3(temp.x,temp.y,temp.z);//vecTemp;
 
         vecTemp.x = mesh->mNormals[i].x;
         vecTemp.y = mesh->mNormals[i].y;
@@ -112,19 +114,13 @@ void Model::processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node)
         // 2. Specular maps
         vector<Texture> specularMaps = loadMaterialTextures(_material, aiTextureType_SPECULAR);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-        // std::cout << "size 1 = " << diffuseMaps.size() << std::endl;
-        // std::cout << "size 2 = " << specularMaps.size() << std::endl;
     }
-
     Mesh tempMesh=Mesh(vertices, indices, textures);
     tempMesh.meshName=node->mName.C_Str();
+    tempMesh.transformation=tr;
     if((signed)mesh->mMaterialIndex >= 0)
     {
         tempMesh.material=new Material(scene->mMaterials[mesh->mMaterialIndex]);
-        // if (tempMesh.meshName.find("glass")==0)
-        //     return;
-        // std::cout << tempMesh.meshName << std::endl;
-        // tempMesh.material->print();
     }
 
     meshes.push_back(tempMesh);
