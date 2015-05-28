@@ -39,6 +39,11 @@ std::map<std::string,Car*> cars;
 Scenario *scenario;
 float ang=0;
 vector<int> carsList={9};
+mat4 moveCar(1.0f);
+int gkey=0;
+int speedKey=0;
+int directionKey=0;
+mat4 cM(1.0f);
 
 void renderCar(int carNr)
 {
@@ -49,7 +54,12 @@ void renderCar(int carNr)
 	sprintf(key,"car%d",carNr);
 
 	mat4 Model = cars[key]->modelMatrix;
-	Model = glm::rotate(Model,ang,glm::vec3(0.0,1.0,0.0));
+	Model = glm::rotate(mat4(1.0f),ang,glm::vec3(0.0,1.0,0.0))*moveCar;
+
+	vec4 v=Model*vec4(0.0f,0.0f,0.0f,1.0f);
+	camera->lookAtPos=vec3(v.x,v.y,v.z);
+
+	camera->update();
 
 	light.loadToShader(program);
 	camera->loadToShader(program,Model);
@@ -59,6 +69,7 @@ void renderCar(int carNr)
 
 void renderScene()
 {
+	
 	shaders["scenario"]->use(true);
 	GLuint program=shaders["scenario"]->getProgram();
 
@@ -77,6 +88,40 @@ void displayWin()
 	shaders["car"]->reloadShader();
 	shaders["scenario"]->reloadShader();
 
+		switch(speedKey) 
+	{
+	case GLUT_KEY_UP :
+			moveCar = glm::translate(moveCar,vec3(0.0,0.0,0.2));
+			break;
+	case GLUT_KEY_DOWN :
+			moveCar = glm::translate(moveCar,vec3(0.0,0.0,-0.2));
+			break;
+	}
+	vec3 v2;
+	vec4 v;
+	switch(directionKey) 
+	{
+	case GLUT_KEY_LEFT :
+			cM = glm::rotate(cM,-3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
+			v2=vec3(0.0f,5.0f,-10.0f);
+			v=vec4(v2.x,v2.y,v2.z,1.0);
+			v=v*cM;
+			v2=vec3(v.x,v.y,v.z);
+			camera->eyePos=v2;
+
+			moveCar = glm::rotate(moveCar,3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
+			break;
+	case GLUT_KEY_RIGHT :
+			cM = glm::rotate(cM,3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
+			v2=vec3(0.0f,5.0f,-10.0f);
+			v=vec4(v2.x,v2.y,v2.z,1.0);
+			v=v*cM;
+			v2=vec3(v.x,v.y,v.z);
+			camera->eyePos=v2;
+
+			moveCar = glm::rotate(moveCar,-3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
+			break;
+	}
 
 	for (int carNr: carsList)
 	{
@@ -96,7 +141,7 @@ void displayWin()
     	lastTime=std::clock();
     }
 
-    ang+=0.003;
+    // ang+=0.003;
 	glutSwapBuffers();
 }
 
@@ -120,6 +165,50 @@ void init()
     // cars["car1"]->modelMatrix = glm::rotate((cars["car1"]->modelMatrix),80.0f,glm::vec3(0.0f,1.0f,0.0f));
 }
 
+void processSpecialKeys(int key, int , int ) 
+{
+	gkey=key;
+	switch( key ) 
+	{
+		case GLUT_KEY_UP:
+		case GLUT_KEY_DOWN:
+			speedKey=key;
+		case GLUT_KEY_RIGHT:
+		case GLUT_KEY_LEFT:
+			directionKey=key;
+			break;
+	}
+	std::cout << gkey << std::endl;
+}
+
+void keyBoardUp( int key, int x, int y )
+{
+	switch( key ) 
+	{
+		case GLUT_KEY_UP:
+		case GLUT_KEY_DOWN:
+			speedKey=0;
+			break;
+		case GLUT_KEY_RIGHT:
+		case GLUT_KEY_LEFT:
+			directionKey=0;
+			break;
+	}
+	gkey=0;
+}
+
+void keyBorardFunc(unsigned char key, int, int)
+{
+	switch(key)
+	{
+		case 27:
+		case 'q':
+			glutLeaveMainLoop();
+			break;
+	}
+	glutPostRedisplay();
+}
+
 int main(int argc, char *argv[])
 {
 	int wWidth=720;
@@ -138,7 +227,7 @@ int main(int argc, char *argv[])
  	glEnable ( GL_ALPHA_TEST ) ;
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
- 	camera = new Camera(vec3(0.0f,5.0f,10.0f),vec3(0.0,0.0,0.0),wWidth,wHeight);
+ 	camera = new Camera(vec3(0.0f,5.0f,-10.0f),vec3(0.0,0.0,0.0),wWidth,wHeight);
 
     GLenum err = glewInit();
     if (err != GLEW_OK)
@@ -151,6 +240,8 @@ int main(int argc, char *argv[])
 	glutReshapeFunc(reshapeWin);
 	glutIdleFunc(idle);
 	glutKeyboardFunc(keyBorardFunc);
+	glutSpecialFunc(processSpecialKeys);
+	glutSpecialUpFunc(keyBoardUp);
     glutMainLoop();
 
 	return 0;
@@ -175,18 +266,6 @@ void reshapeWin(int wWidth, int wHeight)
 {
 	camera->setAspect(wWidth,wHeight);
 	glViewport( 0, 0, wWidth, wHeight );
-	glutPostRedisplay();
-}
-
-void keyBorardFunc(unsigned char key, int, int)
-{
-	switch(key)
-	{
-		case 27:
-		case 'q':
-			glutLeaveMainLoop();
-			break;
-	}
 	glutPostRedisplay();
 }
 
