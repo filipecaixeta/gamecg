@@ -1,0 +1,40 @@
+Mesh and Material names
+
+BODY_COLORED : The body part which have to colored. All metalic materials. (shiny material)
+BODY_NOT_COLORED : The body part which not to be colored. Consists of partially metalic material(shiny) and not shiny materials
+- starts with 'DOORLINE' : NOT shiny material. This material is used on doorlines mostly and some other parts.
+- starts with 'CHROME' : Metalic material that not have to colored.
+GLASS_INTERIOR or GLASS_NO_INTERIOR : All glasses. Material names are also starts with 'GLASS_INTERIOR_ ...' or 'GLASS_NO_INTERIOR_ ...'
+INTERIOR (if exists) : Interior modeling. Material name is also 'INTERIOR'.
+starts with 'LIGHTS_ ...' : Light modelings.
+- starts with 'LIGHT_ ...' : Material that defines light source.
+- GLASS_LIGHT : Material that covers the light source.
+starts with 'TIRE_ ...' : Modelings of 4 each wheels.
+- TIRE : The material of tire.
+
+----------------------------------------------------
+car.info file : contains coordinates of each wheels.
+
+Tire_fl_center_pos_x
+Tire_fl_center_pos_y
+Tire_fl_center_pos_z // front-left
+
+Tire_fr_center_pos_x
+Tire_fr_center_pos_y
+Tire_fr_center_pos_z
+
+Tire_bl_center_pos_x
+Tire_bl_center_pos_y
+Tire_bl_center_pos_z
+
+Tire_br_center_pos_x
+Tire_br_center_pos_y
+Tire_br_center_pos_z
+
+----------------------------------------------------
+Car names
+
+car1 : Dodge Challenger
+car2 : Lamborghini Murcielago LP640
+car3 : Mercedes-Benz SLR McLaren
+car4 : Porsche 911 GT2
