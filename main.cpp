@@ -218,10 +218,35 @@ void keyBorardFunc(unsigned char key, int, int)
 			if (cameraMode==4)
 				cameraMode=1;
 			break;
+		case 'w':
+			speedKey=GLUT_KEY_UP;
+			break;
+		case 's':
+			speedKey=GLUT_KEY_DOWN;
+			break;
+		case 'd':
+			directionKey=GLUT_KEY_RIGHT;
+			break;
+		case 'a':
+			directionKey=GLUT_KEY_LEFT;
+			break;
 	}
 	glutPostRedisplay();
 }
-
+void keyBorardUpFunc(unsigned char key, int, int)
+{
+	switch(key)
+	{
+		case 'w':
+		case 's':
+			speedKey=0;
+			break;
+		case 'd':
+		case 'a':
+			directionKey=0;
+			break;
+	}
+}
 int main(int argc, char *argv[])
 {
 	int wWidth=720;
@@ -253,6 +278,7 @@ int main(int argc, char *argv[])
 	glutReshapeFunc(reshapeWin);
 	glutIdleFunc(idle);
 	glutKeyboardFunc(keyBorardFunc);
+	glutKeyboardUpFunc(keyBorardUpFunc);
 	glutSpecialFunc(processSpecialKeys);
 	glutSpecialUpFunc(keyBoardUp);
     glutMainLoop();
