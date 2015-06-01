@@ -20,6 +20,6 @@ void main(void)
 	Color=color;
 	Normal = normalize(vec3(View*Model*vec4(normal,0.0)));
     TexCoord = vec2(texCoords);
-    gl_Position = Projection*View*Model*vec4(position,1.0);
-    VPos = gl_Position.xyz;
+    VPos = vec4(View*Model*vec4(position,1.0)).xyz;
+    gl_Position = Projection*vec4(VPos,1.0);
 }

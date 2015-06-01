@@ -38,12 +38,12 @@ std::map<std::string,Shader*> shaders;
 std::map<std::string,Car*> cars;
 Scenario *scenario;
 float ang=0;
-vector<int> carsList={9};
+vector<int> carsList={2};
 mat4 moveCar(1.0f);
 int gkey=0;
 int speedKey=0;
 int directionKey=0;
-mat4 cM(1.0f);
+int cameraMode=1;
 
 void renderCar(int carNr)
 {
@@ -56,8 +56,30 @@ void renderCar(int carNr)
 	mat4 Model = cars[key]->modelMatrix;
 	Model = glm::rotate(mat4(1.0f),ang,glm::vec3(0.0,1.0,0.0))*moveCar;
 
-	vec4 v=Model*vec4(0.0f,0.0f,0.0f,1.0f);
+
+	vec4 v;
+	if (cameraMode==1 && string(key)=="car2")
+		v=Model*vec4(0.35f,1.016,0.3f,1.0f);
+	else if (cameraMode==1 && string(key)=="car9")
+		v=Model*vec4(0.35f,1.05,-0.5f,1.0f);
+	else if (cameraMode==2)
+		v=Model*vec4(0.0f,3.0,-10.0f,1.0f);
+
+	camera->eyePos=vec3(v.x,v.y,v.z);
+
+	v=Model*vec4(0.0f,2.0f,10.0f,1.0f);
 	camera->lookAtPos=vec3(v.x,v.y,v.z);
+
+	if (cameraMode==3)
+	{
+		v=Model*vec4(5*sin(ang),4.0,5*cos(ang),1.0f);
+		camera->eyePos=vec3(v.x,v.y,v.z);
+
+		v=Model*vec4(0.0f,0.0f,0.0f,1.0f);
+		camera->lookAtPos=vec3(v.x,v.y,v.z);
+	}
+	else
+		ang=0;
 
 	camera->update();
 
@@ -88,40 +110,25 @@ void displayWin()
 	shaders["car"]->reloadShader();
 	shaders["scenario"]->reloadShader();
 
-		switch(speedKey) 
+	if (speedKey==GLUT_KEY_UP)
 	{
-	case GLUT_KEY_UP :
-			moveCar = glm::translate(moveCar,vec3(0.0,0.0,0.2));
-			break;
-	case GLUT_KEY_DOWN :
-			moveCar = glm::translate(moveCar,vec3(0.0,0.0,-0.2));
-			break;
-	}
-	vec3 v2;
-	vec4 v;
-	switch(directionKey) 
-	{
-	case GLUT_KEY_LEFT :
-			cM = glm::rotate(cM,-3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
-			v2=vec3(0.0f,5.0f,-10.0f);
-			v=vec4(v2.x,v2.y,v2.z,1.0);
-			v=v*cM;
-			v2=vec3(v.x,v.y,v.z);
-			camera->eyePos=v2;
+		moveCar = glm::translate(moveCar,vec3(0.0,0.0,0.2));
 
+		if (directionKey==GLUT_KEY_LEFT)
 			moveCar = glm::rotate(moveCar,3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
-			break;
-	case GLUT_KEY_RIGHT :
-			cM = glm::rotate(cM,3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
-			v2=vec3(0.0f,5.0f,-10.0f);
-			v=vec4(v2.x,v2.y,v2.z,1.0);
-			v=v*cM;
-			v2=vec3(v.x,v.y,v.z);
-			camera->eyePos=v2;
-
+		else if (directionKey==GLUT_KEY_RIGHT)
 			moveCar = glm::rotate(moveCar,-3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
-			break;
 	}
+	else if (speedKey==GLUT_KEY_DOWN)
+	{
+		moveCar = glm::translate(moveCar,vec3(0.0,0.0,-0.2));
+		
+		if (directionKey==GLUT_KEY_RIGHT)
+			moveCar = glm::rotate(moveCar,3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
+		else if (directionKey==GLUT_KEY_LEFT)
+			moveCar = glm::rotate(moveCar,-3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
+	}
+
 
 	for (int carNr: carsList)
 	{
@@ -141,7 +148,7 @@ void displayWin()
     	lastTime=std::clock();
     }
 
-    // ang+=0.003;
+    ang+=0.003;
 	glutSwapBuffers();
 }
 
@@ -173,12 +180,12 @@ void processSpecialKeys(int key, int , int )
 		case GLUT_KEY_UP:
 		case GLUT_KEY_DOWN:
 			speedKey=key;
+			break;
 		case GLUT_KEY_RIGHT:
 		case GLUT_KEY_LEFT:
 			directionKey=key;
 			break;
 	}
-	std::cout << gkey << std::endl;
 }
 
 void keyBoardUp( int key, int x, int y )
@@ -199,11 +206,17 @@ void keyBoardUp( int key, int x, int y )
 
 void keyBorardFunc(unsigned char key, int, int)
 {
+	// std::cout << key << std::endl;
 	switch(key)
 	{
 		case 27:
 		case 'q':
 			glutLeaveMainLoop();
+			break;
+		case 'c':
+			cameraMode++;
+			if (cameraMode==4)
+				cameraMode=1;
 			break;
 	}
 	glutPostRedisplay();

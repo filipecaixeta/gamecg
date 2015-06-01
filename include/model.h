@@ -9,8 +9,10 @@
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <camera.h>
 
 using std::string;
+using std::vector;
 
 class Model
 {
