@@ -157,7 +157,7 @@ void init()
 	shaders["scenario"]	= new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
 
 	// Load the scenario mesh
-	scenario = new Scenario(baseDir+"3dModels/city6/city.obj");
+	scenario = new Scenario(baseDir+"3dModels/city3/city.obj");
 
 	// Load one car mesh
 	for (int carNr: carsList)

@@ -27,6 +27,8 @@ class Mesh
 		mat4 transformation;
 		Material *material;
 		vec3 center;
+		vec3 cmin;
+		vec3 cmax;
 	private:
 		GLuint vertexArrayObject;
 		GLuint vertexBufferObject;

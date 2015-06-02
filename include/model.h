@@ -26,6 +26,8 @@ public:
 	GLint TextureFromFile(string filename, string directory);
 	vector<Mesh> meshes;
 	string directory;
+	vec3 cmin;
+	vec3 cmax;
 };
 
 #endif

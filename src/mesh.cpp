@@ -16,6 +16,20 @@ Mesh::Mesh(vector<Vertex> vertices,vector<GLuint> indices,vector<Texture> textur
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    cmin=vec3(INFINITY,INFINITY,INFINITY);
+	cmax=vec3(-INFINITY,-INFINITY,-INFINITY);
+    for(Vertex &v: vertices)
+    {
+    	cmin.x=fmin(v.Position.x,cmin.x);
+    	cmin.y=fmin(v.Position.y,cmin.y);
+    	cmin.z=fmin(v.Position.z,cmin.z);
+
+    	cmax.x=fmax(v.Position.x,cmax.x);
+    	cmax.y=fmax(v.Position.y,cmax.y);
+    	cmax.z=fmax(v.Position.z,cmax.z);
+    }
+
 }
 
 void Mesh::draw(Shader *shader)

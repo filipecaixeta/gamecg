@@ -22,6 +22,19 @@ Model::Model(string path)
 	}
 	directory = path.substr(0, path.find_last_of('/'));
 	processNode(scene->mRootNode, scene);
+
+    cmin=vec3(INFINITY,INFINITY,INFINITY);
+    cmax=vec3(-INFINITY,-INFINITY,-INFINITY);
+    for(Mesh &m: meshes)
+    {
+        cmin.x=fmin(m.cmin.x,cmin.x);
+        cmin.y=fmin(m.cmin.y,cmin.y);
+        cmin.z=fmin(m.cmin.z,cmin.z);
+
+        cmax.x=fmax(m.cmax.x,cmax.x);
+        cmax.y=fmax(m.cmax.y,cmax.y);
+        cmax.z=fmax(m.cmax.z,cmax.z);
+    }
 }
 
 void Model::processNode(aiNode* node, const aiScene* scene)
