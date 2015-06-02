@@ -88,7 +88,6 @@ void renderCar(int carNr)
 
     cars[key]->draw(shaders["car"]);
 }
-
 void renderScene()
 {
 	
@@ -103,7 +102,6 @@ void renderScene()
 
     scenario->draw(shaders["scenario"]);
 }
-
 void displayWin()
 {
 	clear(0.22,0.22,0.22,1.0);
@@ -151,7 +149,6 @@ void displayWin()
     ang+=0.003;
 	glutSwapBuffers();
 }
-
 void init()
 {
 	// Shader for all the cars
@@ -160,18 +157,14 @@ void init()
 	shaders["scenario"]	= new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
 
 	// Load the scenario mesh
-	scenario = new Scenario(baseDir+"3dModels/city3/city.obj");
+	scenario = new Scenario(baseDir+"3dModels/city6/city.obj");
 
 	// Load one car mesh
 	for (int carNr: carsList)
 	{
 		loadCar(carNr);
 	}
-    // cars["car1"] = new Car(baseDir+"3dModels/car9/car.obj");
-    // cars["car1"]->setColor(vec4(0.67,0.48,0.0,1.0));
-    // cars["car1"]->modelMatrix = glm::rotate((cars["car1"]->modelMatrix),80.0f,glm::vec3(0.0f,1.0f,0.0f));
 }
-
 void processSpecialKeys(int key, int , int ) 
 {
 	gkey=key;
@@ -187,7 +180,6 @@ void processSpecialKeys(int key, int , int )
 			break;
 	}
 }
-
 void keyBoardUp( int key, int x, int y )
 {
 	switch( key ) 
@@ -203,7 +195,6 @@ void keyBoardUp( int key, int x, int y )
 	}
 	gkey=0;
 }
-
 void keyBorardFunc(unsigned char key, int, int)
 {
 	// std::cout << key << std::endl;
