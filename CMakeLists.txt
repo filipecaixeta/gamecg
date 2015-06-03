@@ -16,8 +16,8 @@ endif()
 # FIND OPENGL
 #########################################################
 find_package(OpenGL REQUIRED)
-if (OpenGL_FOUND)
-    include_directories(${OPENGL_INCLUDE_DIRS})
+if (OPENGL_FOUND)
+    include_directories(${OpenGL_INCLUDE_DIRS})
     link_directories(${OpenGL_LIBRARY_DIRS})
     add_definitions(${OpenGL_DEFINITIONS})
 else()
@@ -90,7 +90,6 @@ find_library(ASSIMP2 assimp /usr/local/lib/libassimp)
 #########################################################
 # INCLUDE FILES
 #########################################################
-
 set(SOURCES 
 	src/model.cpp
 	src/mesh.cpp
@@ -102,7 +101,12 @@ set(SOURCES
 	src/camera.cpp
 	src/light.cpp
 	src/stb_image.c)
-	
+
+add_executable(${PROJECT_NAME} main.cpp ${SOURCES})
+
+#########################################################
+# LLINKING & STUFF
+#########################################################
 set(ALL_LIBS
 	${OPENGL_LIBRARIES}
 	${GLUT_LIBRARIES}
@@ -113,12 +117,6 @@ set(ALL_LIBS
 	${ASSIMP_LIBRARY}
 	${ASSIMP2}
 )
-
-add_executable(${PROJECT_NAME} main.cpp ${SOURCES})
-
-########################################################
-# LLINKING & STUFF
-#########################################################
 
 target_link_libraries(${PROJECT_NAME} ${ALL_LIBS} assimp)
 
