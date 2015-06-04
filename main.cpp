@@ -18,6 +18,19 @@
 #include <kdtree.hpp>
 #include <light.h>
 #include <camera.h>
+#include <vehiclePhysic.h>
+
+
+//TEST*************************************
+//#define DEBUG_MODE
+#ifdef DEBUG_MODE
+#include "GlutStuff.h"
+#include "GLDebugDrawer.h"
+#include "btBulletDynamicsCommon.h"
+
+GLDebugDrawer	gDebugDrawer;
+#endif
+//****************************************
 
 #define RANDF (rand()%100)*0.01
 
@@ -35,6 +48,8 @@ void loadCar(int carNr);
 // GLOBAL VARIABLES
 Light light(vec3(0.0f,2.0f,10.0f));
 Camera *camera;
+
+VehiclePhysic* MainCar;
 
 std::map<std::string,Shader*> shaders;
 std::map<std::string,Car*> cars;
@@ -73,6 +88,7 @@ void renderCar(int carNr)
 	mat4 Model = cars[key]->modelMatrix;
 	Model = glm::rotate(mat4(1.0f),ang,glm::vec3(0.0,1.0,0.0))*moveCar;
 
+	Model = MainCar->GetVehicleMatrix() * Model;
 	vec4 v;
 	if (cameraMode==1 && string(key)=="car2")
 		v=Model*vec4(0.35f,1.016,0.3f,1.0f);
@@ -125,8 +141,7 @@ void displayWin()
 	clear(0.22,0.22,0.22,1.0);
 	shaders["car"]->reloadShader();
 	shaders["scenario"]->reloadShader();
-
-	if (speedKey==GLUT_KEY_UP)
+	/*if (speedKey==GLUT_KEY_UP)
 	{
 		moveCar = glm::translate(moveCar,vec3(0.0,0.0,0.2));
 
@@ -143,8 +158,43 @@ void displayWin()
 			moveCar = glm::rotate(moveCar,3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
 		else if (directionKey==GLUT_KEY_LEFT)
 			moveCar = glm::rotate(moveCar,-3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
+	}*/
+
+	if (speedKey==GLUT_KEY_UP)
+	{
+		MainCar->KeyDown(KEY_FORWARD);
+
+		if (directionKey==GLUT_KEY_LEFT)
+			MainCar->KeyDown(KEY_LEFT);
+		else if (directionKey==GLUT_KEY_RIGHT)
+			MainCar->KeyDown(KEY_RIGHT);
+		else if (directionKey == 0)
+			MainCar->KeyUp(KEY_LEFT);
+	}
+	else if (speedKey==GLUT_KEY_DOWN)
+	{
+		MainCar->KeyDown(KEY_BACK);
+		
+		if (directionKey==GLUT_KEY_RIGHT)
+			MainCar->KeyDown(KEY_LEFT);
+		else if (directionKey==GLUT_KEY_LEFT)
+			MainCar->KeyDown(KEY_RIGHT);
+		else if (directionKey == 0)
+			MainCar->KeyUp(KEY_LEFT);
+	}
+	else if (speedKey == 0)
+	{
+		MainCar->KeyUp(KEY_FORWARD);
+
+		if (directionKey==GLUT_KEY_RIGHT)
+			MainCar->KeyDown(KEY_LEFT);
+		else if (directionKey==GLUT_KEY_LEFT)
+			MainCar->KeyDown(KEY_RIGHT);
+		else if (directionKey == 0)
+			MainCar->KeyUp(KEY_LEFT);
 	}
 
+	MainCar->MoveVehicle();
 
 	for (int carNr: carsList)
 	{
@@ -176,12 +226,32 @@ void init()
 
 	// Load the scenario mesh
 	scenario = new Scenario(baseDir+"3dModels/city3/city.obj");
-
+	std::cerr << "SHADERS" << std::endl;
 	// Load one car mesh
 	for (int carNr: carsList)
 	{
 		loadCar(carNr);
 	}
+	std::cerr << "CAR" << std::endl;
+	Mesh* meshP;
+	for (Mesh &m: scenario->model.meshes)
+	{
+		if (m.meshName=="city_block")
+		{
+			meshP=&m;
+			break;
+		}
+	}
+
+	/*int indSize = meshP->indices.size();
+	int triangleSize = indSize / 3;
+	GLuint* firstInd = &(meshP->indices[0]);
+	int indexStride = 3 * sizeof(GLuint);
+	int totalVert = meshP->vertices.size();
+	float* firstVert = &(meshP->vertices[0].Position.x);
+	int vertStride = sizeof(Vertex);
+	MainCar = new VehiclePhysic(triangleSize, (int*)firstInd, indexStride, totalVert, firstVert, vertStride);
+*/
 }
 void processSpecialKeys(int key, int , int ) 
 {
@@ -268,6 +338,10 @@ void keyBorardUpFunc(unsigned char key, int, int)
 }
 int main(int argc, char *argv[])
 {
+	std::cerr<<"LOL!";
+#ifndef DEBUG_MODE
+	MainCar = new VehiclePhysic;
+
 	int wWidth=720;
 	int wHeight=480;
 
@@ -301,8 +375,18 @@ int main(int argc, char *argv[])
 	glutSpecialFunc(processSpecialKeys);
 	glutSpecialUpFunc(keyBoardUp);
     glutMainLoop();
+    return 0;
+#else
+    std::cerr << "LOL";
+    int wWidth=720;
+	int wHeight=480;
 
-	return 0;
+    camera = new Camera(vec3(0.0f,5.0f,-10.0f),vec3(0.0,0.0,0.0),wWidth,wHeight);
+    //init();
+    MainCar = new VehiclePhysic;
+    MainCar->getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
+	return glutmain(argc, argv,640,480,"Bullet Vehicle Demo. http://www.continuousphysics.com/Bullet/phpBB2/", MainCar);;
+#endif
 }
 
 void loadCar(int carNr)

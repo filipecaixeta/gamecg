@@ -19,6 +19,8 @@ class btCollisionShape;
 
 #include <glm/glm.hpp>
 
+#include "GlutDemoApplication.h"
+
 enum Keys
 {
 	KEY_FORWARD,
@@ -43,7 +45,7 @@ typedef struct CarPos
 }CarPos;
 
 
-class VehiclePhysic
+class VehiclePhysic : public GlutDemoApplication
 {
 public:
 	btRigidBody* m_carChassis;
@@ -69,25 +71,56 @@ public:
 	btCollisionShape*	m_wheelShape;
 
 	VehiclePhysic();
+	VehiclePhysic(int totalTriangles, int* gIndices, int indexStride, int totalVerts, float* firstElement, int vertStride);
 	virtual ~VehiclePhysic();
-	void InitPhysics();
+	void initPhysics();
 	void KeyDown(int key);
 	void KeyUp(int key);
 	void MoveVehicle();
 	void ResetVehicle();
+	void CreateTerrain(btTransform tr, btCollisionShape* groundShape);
 	glm::mat4 GetVehicleMatrix();
 	btDynamicsWorld* GetDynamicsWorld();
+
+
+	float		m_cameraHeight;
+
+	float	m_minCameraDistance;
+	float	m_maxCameraDistance;
+
+	virtual void clientMoveAndDisplay();
+
+	virtual void	clientResetScene();
+
+	virtual void displayCallback();
+	
+	///a very basic camera following the vehicle
+	virtual void updateCamera();
+
+	virtual void specialKeyboard(int key, int x, int y);
+
+	virtual void specialKeyboardUp(int key, int x, int y);
+
+	void renderme();
+
+	static DemoApplication* Create()
+	{
+		VehiclePhysic* demo = new VehiclePhysic();
+		demo->myinit();
+		demo->initPhysics();
+		return demo;
+	}
 
 private:
 	///this is the most important class
 	//TODO: Maybe move this to a physics class
-	btDynamicsWorld*	m_dynamicsWorld;
-	btScalar			m_defaultContactProcessingThreshold;
+	/*btDynamicsWorld*	m_dynamicsWorld;
+	btScalar			m_defaultContactProcessingThreshold;*/
 
 	float	gEngineForce = 0.f;
 	float	gBreakingForce = 0.f;
 
-	float	maxEngineForce = 1400.f;//this should be engine/velocity dependent
+	float	maxEngineForce = 3000.f;//this should be engine/velocity dependent
 	float	maxBreakingForce = 200.f;
 
 	float	gVehicleSteering = 0.f;
@@ -103,6 +136,13 @@ private:
 
 	CarPos carPos;
 	btScalar carPosRot[16];
+
+	int totalTriangles;
+	int* gIndices;
+	int indexStride;
+	int totalVerts;
+	float* firstElement;
+	int vertStride;
 
 
 	btScalar suspensionRestLength;
