@@ -18,6 +18,7 @@
 #include <kdtree.hpp>
 #include <light.h>
 #include <camera.h>
+#include <queue>
 
 #define RANDF (rand()%100)*0.01
 
@@ -49,6 +50,8 @@ int cameraMode=1;
 float carang=0.0;
 float carang2=0.0;
 int sentido=1;
+std::queue<vec3> eyePosQ;
+std::queue<vec3> lookAtPosQ;
 
 void renderCar(int carNr)
 {
@@ -74,18 +77,30 @@ void renderCar(int carNr)
 	Model = glm::rotate(mat4(1.0f),ang,glm::vec3(0.0,1.0,0.0))*moveCar;
 
 	vec4 v;
-	if (cameraMode==1 && string(key)=="car2")
-		v=Model*vec4(0.35f,1.016,0.3f,1.0f);
-	else if (cameraMode==1 && string(key)=="car9")
-		v=Model*vec4(0.35f,1.55,-0.5f,1.0f);
-	else if (cameraMode==2)
+	
+	if (cameraMode==1)
+	{
+		if (string(key)=="car2")
+			v=Model*vec4(0.35f,1.016,0.3f,1.0f);
+		else if (string(key)=="car9")
+			v=Model*vec4(0.35f,1.55,-0.5f,1.0f);
+		camera->eyePos=vec3(v.x,v.y,v.z);
+		v=Model*vec4(0.0f,1.0f,6.0f,1.0f);
+		camera->lookAtPos=vec3(v.x,v.y,v.z);
+	}
+	if (cameraMode==2)
+	{
 		v=Model*vec4(0.0f,3.0,-10.0f,1.0f);
-
-	camera->eyePos=vec3(v.x,v.y,v.z);
-
-	v=Model*vec4(0.0f,1.0f,6.0f,1.0f);
-	camera->lookAtPos=vec3(v.x,v.y,v.z);
-
+		eyePosQ.push(vec3(v.x,v.y,v.z));
+		camera->eyePos=eyePosQ.front();
+		if (eyePosQ.size()>=15)
+			eyePosQ.pop();
+		v=Model*vec4(0.0f,1.0f,6.0f,1.0f);
+		lookAtPosQ.push(vec3(v.x,v.y,v.z));
+		camera->lookAtPos=lookAtPosQ.front();
+		if (lookAtPosQ.size()>=15)
+			lookAtPosQ.pop();
+	}
 	if (cameraMode==3)
 	{
 		// ang=1;
@@ -175,7 +190,7 @@ void init()
 	shaders["scenario"]	= new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
 
 	// Load the scenario mesh
-	scenario = new Scenario(baseDir+"3dModels/city3/city.obj");
+	scenario = new Scenario(baseDir+"3dModels/city5/city.obj");
 
 	// Load one car mesh
 	for (int carNr: carsList)

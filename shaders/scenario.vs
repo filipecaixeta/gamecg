@@ -15,12 +15,15 @@ varying vec3 Normal;
 varying vec2 TexCoord;
 varying vec3 Color;
 varying vec3 VPos;
+varying vec4 vEyeSpacePos;
 
 void main(void)
 {
 	Color=color;
 	Normal = normalize(vec3(View*Model*vec4(normal,0.0)));
     TexCoord = vec2(texCoords);
-    gl_Position = Projection*View*Model*vec4(position,1.0);
+    vec4 vEyeSpacePosVertex = View*Model*vec4(position,1.0);
+    vEyeSpacePos = vEyeSpacePosVertex;
+    gl_Position = Projection*vEyeSpacePosVertex;
     VPos = gl_Position.xyz;
 }

@@ -35,6 +35,7 @@ varying vec3 Normal;
 varying vec2 TexCoord;
 varying vec3 Color;
 varying vec3 VPos;
+varying vec4 vEyeSpacePos;
 
 vec4 light0()
 {
@@ -119,7 +120,18 @@ vec4 light1()
     return color;
 }
 
+float getFogFactor(float fFogCoord)
+{
+   // float fResult = (400.0f-fFogCoord)/(400.0f-10.0f);
+   float fResult = exp(-pow(0.005f*fFogCoord, 2.0)); 
+   fResult = 1.0-clamp(fResult, 0.0, 1.0);
+   return fResult;
+}
+
 void main()
 {
-    gl_FragColor = light1();
+    vec4 outputColor = light1();
+    float fFogCoord = abs(vEyeSpacePos.z/vEyeSpacePos.w);
+    outputColor = mix(outputColor, vec4(0.2f,0.2f,0.2f,1.0f), getFogFactor(fFogCoord)); 
+    gl_FragColor = outputColor;
 }
