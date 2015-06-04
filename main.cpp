@@ -19,6 +19,8 @@
 #include <light.h>
 #include <camera.h>
 
+#define RANDF (rand()%100)*0.01
+
 const std::string baseDir="../";
 using namespace glm;
 
@@ -38,12 +40,15 @@ std::map<std::string,Shader*> shaders;
 std::map<std::string,Car*> cars;
 Scenario *scenario;
 float ang=0;
-vector<int> carsList={2};
+vector<int> carsList={9};
 mat4 moveCar(1.0f);
 int gkey=0;
 int speedKey=0;
 int directionKey=0;
 int cameraMode=1;
+float carang=0.0;
+float carang2=0.0;
+int sentido=1;
 
 void renderCar(int carNr)
 {
@@ -53,25 +58,38 @@ void renderCar(int carNr)
 	char key[50];
 	sprintf(key,"car%d",carNr);
 
+	cars[key]->updateFrontWheel(carang2);
+	cars[key]->spinWheel(carang);
+	carang+=0.1;
+	carang2+=0.01*sentido;
+	if (fabs(carang2)>1.0)
+	{
+		if (sentido==1)
+			sentido=-1;
+		else
+			sentido=1;
+	}
+
 	mat4 Model = cars[key]->modelMatrix;
 	Model = glm::rotate(mat4(1.0f),ang,glm::vec3(0.0,1.0,0.0))*moveCar;
-
 
 	vec4 v;
 	if (cameraMode==1 && string(key)=="car2")
 		v=Model*vec4(0.35f,1.016,0.3f,1.0f);
 	else if (cameraMode==1 && string(key)=="car9")
-		v=Model*vec4(0.35f,1.05,-0.5f,1.0f);
+		v=Model*vec4(0.35f,1.55,-0.5f,1.0f);
 	else if (cameraMode==2)
 		v=Model*vec4(0.0f,3.0,-10.0f,1.0f);
 
 	camera->eyePos=vec3(v.x,v.y,v.z);
 
-	v=Model*vec4(0.0f,2.0f,10.0f,1.0f);
+	v=Model*vec4(0.0f,1.0f,6.0f,1.0f);
 	camera->lookAtPos=vec3(v.x,v.y,v.z);
 
 	if (cameraMode==3)
 	{
+		// ang=1;
+		// v=Model*vec4(4*sin(ang),1.5,3*cos(ang),1.0f);
 		v=Model*vec4(5*sin(ang),4.0,5*cos(ang),1.0f);
 		camera->eyePos=vec3(v.x,v.y,v.z);
 
@@ -221,6 +239,16 @@ void keyBorardFunc(unsigned char key, int, int)
 		case 'a':
 			directionKey=GLUT_KEY_LEFT;
 			break;
+		case 'p':
+			directionKey=GLUT_KEY_LEFT;
+			break;
+	}
+	if (key=='p')
+	{
+		for (auto& c: cars)
+		{
+			c.second->setColor(vec4(RANDF,RANDF,RANDF,1.0));
+		}
 	}
 	glutPostRedisplay();
 }

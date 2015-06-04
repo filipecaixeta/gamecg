@@ -2,7 +2,7 @@
 #include <iostream>
 
 Mesh::Mesh(vector<Vertex> vertices,vector<GLuint> indices,vector<Texture> textures)
-:vertices(vertices),indices(indices),textures(textures)
+:vertices(vertices),indices(indices),textures(textures),transformation(1.0f)
 {
 	glGenBuffers(1, &vertexBufferObject);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
@@ -29,6 +29,7 @@ Mesh::Mesh(vector<Vertex> vertices,vector<GLuint> indices,vector<Texture> textur
     	cmax.y=fmax(v.Position.y,cmax.y);
     	cmax.z=fmax(v.Position.z,cmax.z);
     }
+    center=(cmin+cmax)/2.0f;
 
 }
 
@@ -40,6 +41,9 @@ void Mesh::draw(Shader *shader)
 	glBindBuffer(GL_ARRAY_BUFFER,vertexBufferObject);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,elementBufferObject);
 	
+	glUniformMatrix4fv(glGetUniformLocation(program, "Model2")
+		, 1, GL_FALSE, &transformation[0][0]);
+
 	// Vertex Positions
 	GLuint position=glGetAttribLocation(program,"position");
     glEnableVertexAttribArray(position);
@@ -81,7 +85,6 @@ void Mesh::draw(Shader *shader)
 		glBindTexture(GL_TEXTURE_2D, texture.id);
 		i++;
 	}
-
 
 	material->loadToShader(program);
 	glUniform1i(glGetUniformLocation(program,"useTexture"), textures.size());

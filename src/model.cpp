@@ -11,10 +11,11 @@ using std::string;
 Model::Model(string path)
 {
 	Assimp::Importer importer;
+    std::cout << "Aqui 1"<< std::endl;
 	const aiScene* scene = importer.ReadFile(path.c_str(), 
         aiProcess_Triangulate | aiProcess_FlipUVs |
-        aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals );
-
+         aiProcess_GenSmoothNormals );
+    std::cout << "Aqui 2"<< std::endl;
 	if(!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		std::cout << "ERROR: ASSIMP " << importer.GetErrorString()<< std::endl;

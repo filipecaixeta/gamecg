@@ -112,12 +112,18 @@ vec4 light1()
     vec4 Ird = max(Kd*dot(l,n)*Id,0.0);                 // diffuse reflection
     vec4 Irs = max(Ks*pow(dot(h,n),shininess)*Is,0.0);  // specular reflection
 
-    vec4 color = vec4(Ira*2 + Ird*5.5 + Irs*4.5);
+    vec4 color = vec4(Ira*2+Ird*4.0+Irs*2.0);
+    if (material.color_emissive.xyz!=vec3(0.0,0.0,0.0))
+    {
+        color=color*0.5+material.color_emissive*0.5;
+    }
     color.a = material.color_transparent.a;
     return color;
 }
 
 void main()
 {
+    
     gl_FragColor = light1();
+        
 }
