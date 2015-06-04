@@ -6,7 +6,7 @@ project(main)
 # COMPILATION DIRECTIVES
 #########################################################
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ASSIMP_CXX_FLAGS} -Wall -Wextra -fms-extensions -std=c++11 -Wunused-parameter")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ASSIMP_CXX_FLAGS} -fms-extensions -std=c++11 ")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
 endif()
@@ -75,6 +75,7 @@ ${BULLET_PHYSICS_SOURCE_DIR}/src
 FIND_LIBRARY( BULLET_DYNAMICS BulletDynamics /usr/local/lib/libBulletDynamics)
 FIND_LIBRARY( BULLET_COLLISION BulletCollision /usr/local/lib/libBulletCollision)
 FIND_LIBRARY( LINEAR_MATH LinearMath /usr/local/lib/libLinearMath)
+FIND_LIBRARY( OPENGL_SUP OpenGLSupport /usr/local/lib/libOpenGLSupport)
 
 #  ASSIMP_DIR - The preferred installation prefix for searching for ASSIMP. Set by the user.
 #
@@ -101,6 +102,8 @@ set(SOURCES
 	src/camera.cpp
 	src/light.cpp
 	src/vehiclePhysic.cpp
+	src/DemoApplication.cpp
+	src/GlutDemoApplication.cpp
 	src/stb_image.c)
 
 add_executable(${PROJECT_NAME} main.cpp ${SOURCES})
@@ -115,6 +118,7 @@ set(ALL_LIBS
 	${BULLET_DYNAMICS}
 	${BULLET_COLLISION}
 	${LINEAR_MATH}
+	${OPENGL_SUP}
 	${ASSIMP_LIBRARY}
 	${ASSIMP2}
 )
