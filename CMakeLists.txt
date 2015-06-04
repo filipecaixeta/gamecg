@@ -100,6 +100,7 @@ set(SOURCES
 	include/kdtree.hpp
 	src/camera.cpp
 	src/light.cpp
+	src/vehiclePhysic.cpp
 	src/stb_image.c)
 
 add_executable(${PROJECT_NAME} main.cpp ${SOURCES})
