@@ -258,16 +258,8 @@ void init()
 	{
 		loadCar(carNr);
 	}
-	std::cerr << "CAR" << std::endl;
-	Mesh* meshP;
-	for (Mesh &m: scenario->model.meshes)
-	{
-		if (m.meshName=="city_block")
-		{
-			meshP=&m;
-			break;
-		}
-	}
+
+	MainCar = new VehiclePhysic(scenario);
 
 	/*int indSize = meshP->indices.size();
 	int triangleSize = indSize / 3;
@@ -375,8 +367,8 @@ int main(int argc, char *argv[])
 {
 	
 #ifndef DEBUG_MODE
-	MainCar = new VehiclePhysic;
-	std::cerr<<"DEBUG_MODE!";
+	// MainCar = new VehiclePhysic;
+	// std::cerr<<"DEBUG_MODE!";
 	int wWidth=720;
 	int wHeight=480;
 
@@ -389,7 +381,7 @@ int main(int argc, char *argv[])
  	
  	glEnable(GL_DEPTH_TEST); 
  	glEnable ( GL_ALPHA_TEST ) ;
- 	glAlphaFunc ( GL_GREATER, 0.5 ) ;
+ 	glAlphaFunc ( GL_GREATER, 0.8 ) ;
  	
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

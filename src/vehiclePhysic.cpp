@@ -5,6 +5,7 @@
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 
+
 // By default, Bullet Vehicle uses Y as up axis.
 
 int rightIndex = 0;
@@ -20,19 +21,12 @@ const int maxOverlap = 65535;
 
 #define CUBE_HALF_EXTENT 1
 
-
-VehiclePhysic::VehiclePhysic() : 
+VehiclePhysic::VehiclePhysic(Scenario *scenario): 
 m_carChassis(0),
 m_vertices(0),
 m_cameraHeight(4.f),
 m_minCameraDistance(3.f),
 m_maxCameraDistance(10.f),
-totalTriangles(0),
-gIndices(0),
-indexStride(0),
-totalVerts(0),
-firstElement(0),
-vertStride(0),
 gEngineForce(0.f),
 gBreakingForce(0.f),
 maxEngineForce(2000.f),//this should be engine/velocity dependent
@@ -49,50 +43,105 @@ suspensionCompression(4.4f),
 rollInfluence(0.1f),//1.0f;
 suspensionRestLength(0.6)
 {
-	m_vehicle = 0;
-	m_wheelShape = 0;
-	m_cameraPosition = btVector3(30,30,30);
-	initPhysics();
-	for (int i = 0; i < 16; ++i)
+
+	int totalVerts = 0;
+	int totalTriangles = 0;
+	
+	Mesh* meshP;
+	for (Mesh &m: scenario->model.meshes)
 	{
-		carPosRot[i] = 0.0;
-		if(i % 5 == 0)
-			carPosRot[i] = 1.0;
+		totalVerts += m.vertices.size();
+		totalTriangles += m.indices.size()/3;
 	}
-}
 
-VehiclePhysic::VehiclePhysic(int totalTriangles, int* gIndices, int indexStride, int totalVerts, float* firstElement, int vertStride) : 
-m_carChassis(0),
-m_vertices(0),
-m_cameraHeight(4.f),
-m_minCameraDistance(3.f),
-m_maxCameraDistance(10.f),
-totalTriangles(totalTriangles),
-gIndices(gIndices),
-indexStride(indexStride),
-totalVerts(totalVerts),
-firstElement(firstElement),
-vertStride(vertStride),
-gEngineForce(0.f),
-gBreakingForce(0.f),
-maxEngineForce(2000.f),//this should be engine/velocity dependent
-maxBreakingForce(200.f),
-gVehicleSteering(0.f),
-steeringIncrement(0.04f),
-steeringClamp(0.3f),
-wheelRadius(0.5f),
-wheelWidth(0.2f),
-wheelFriction(1000),//BT_LARGE_
-suspensionStiffness(20.f),
-suspensionDamping(2.3f),
-suspensionCompression(4.4f),
-rollInfluence(0.1f),//1.0f;
-suspensionRestLength(0.6)
-{
+	vector<vec3> vertices;
+	vector<int> indices;
+	int vertStride = sizeof(vec3);
+	int indexStride = 3*sizeof(int);
+
+	vertices.resize(totalVerts);
+	indices.resize(totalTriangles*3);
+
+	vector<vec3>::iterator v=vertices.begin();
+	vector<int>::iterator i=indices.begin();
+	int indexPos=0;
+
+	for (Mesh &m: scenario->model.meshes)
+	{
+		for (auto &vert: m.vertices)
+		{
+			*v++=vert.Position;
+			indexPos++;
+		}
+		for (int ind: m.indices)
+		{
+			*i++=ind+indexPos;
+		}
+	}
+	std::cerr << "vertices.size()=" << vertices.size() << std::endl;
+	std::cerr << "indices.size()=" << indices.size()/3 << std::endl;
+	int* gIndices = &(indices[0]);
+	btScalar *verticesBeg = (btScalar*)&(vertices[0].x);
+
 	m_vehicle = 0;
 	m_wheelShape = 0;
 	m_cameraPosition = btVector3(30,30,30);
-	initPhysics();
+
+	m_collisionConfiguration = new btDefaultCollisionConfiguration();
+	m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
+
+	vec3 wMin=scenario->model.cmin;
+	vec3 wMax=scenario->model.cmax;
+	btVector3 worldMin(wMin.x,wMin.y,wMin.z);
+	btVector3 worldMax(wMax.x,wMax.y,wMax.z);
+
+	m_overlappingPairCache = new btAxisSweep3(worldMin,worldMax);
+	m_constraintSolver = new btSequentialImpulseConstraintSolver();
+	m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher,m_overlappingPairCache,m_constraintSolver,m_collisionConfiguration);
+	
+	//create a triangle mesh ground
+
+	m_indexVertexArrays = new btTriangleIndexVertexArray(totalTriangles,
+		gIndices,
+		indexStride,
+		totalVerts,
+		verticesBeg,
+		vertStride);
+
+	bool useQuantizedAabbCompression = true;
+	btCollisionShape* groundShape = new btBvhTriangleMeshShape(m_indexVertexArrays,useQuantizedAabbCompression);
+	
+	btTransform tr;
+	tr.setIdentity();
+	tr.setOrigin(btVector3(0,0.f,0));
+
+	m_collisionShapes.push_back(groundShape);
+	
+	localCreateRigidBody(0, tr, groundShape);
+	tr.setOrigin(btVector3(0,0,0));
+
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.f,0.5f,2.f));
+	m_collisionShapes.push_back(chassisShape);
+
+	btCompoundShape* compound = new btCompoundShape();
+	m_collisionShapes.push_back(compound);
+	btTransform localTrans;
+	localTrans.setIdentity();
+	//localTrans effectively shifts the center of mass with respect to the chassis
+	localTrans.setOrigin(btVector3(0,1,0));
+
+	compound->addChildShape(localTrans,chassisShape);
+
+	tr.setOrigin(btVector3(0.0f,0.0f,0.0f));
+
+	m_carChassis = localCreateRigidBody(800,tr,compound);//chassisShape);
+	
+	m_wheelShape = new btCylinderShapeX(btVector3(wheelWidth,wheelRadius,wheelRadius));
+
+	ResetVehicle();
+
+	CreateVehicle();
+
 	for (int i = 0; i < 16; ++i)
 	{
 		carPosRot[i] = 0.0;
@@ -149,109 +198,6 @@ VehiclePhysic::~VehiclePhysic()
 	delete m_collisionConfiguration;
 }
 
-void VehiclePhysic::initPhysics()
-{
-	m_collisionConfiguration = new btDefaultCollisionConfiguration();
-	m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
-	btVector3 worldMin(-1000,-1000,-1000);
-	btVector3 worldMax(1000,1000,1000);
-	m_overlappingPairCache = new btAxisSweep3(worldMin,worldMax);
-	m_constraintSolver = new btSequentialImpulseConstraintSolver();
-	m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher,m_overlappingPairCache,m_constraintSolver,m_collisionConfiguration);
-
-	btCollisionShape* groundShape = new btBoxShape(btVector3(400,3,400));
-	m_collisionShapes.push_back(groundShape);
-
-	btTransform tr;
-	tr.setIdentity();
-	tr.setOrigin(btVector3(0,-3.f,0));
-
-// Create Mesh **********************************************
-	const float TRIANGLE_SIZE=20.f;
-
-	//create a triangle mesh ground
-	int vertStride = sizeof(btVector3);
-	int indexStride = 3 * sizeof(int);
-
-	const int NUM_VERTS_X = 20;
-	const int NUM_VERTS_Y = 20;
-	const int totalVerts = NUM_VERTS_X*NUM_VERTS_Y;
-	const int totalTriangles = 2 * (NUM_VERTS_X - 1) * (NUM_VERTS_Y - 1);
-
-	m_vertices = new btVector3[totalVerts];
-	int* gIndices = new int[totalTriangles * 3];
-
-	for(int i = 0; i < NUM_VERTS_X; i++)
-	{
-		for (int j = 0; j < NUM_VERTS_Y; j++)
-		{
-			float wl = 0.2f;
-			float height = 60.f*sinf(float(i)*wl)*cosf(float(j)*wl);//0.0f;
-
-			m_vertices[i + j * NUM_VERTS_X].setValue(
-				(i - NUM_VERTS_X * 0.5f) * TRIANGLE_SIZE,
-				height,
-				(j - NUM_VERTS_Y * 0.5f) * TRIANGLE_SIZE
-				);
-		}
-	}
-
-	int index = 0;
-	for(int i = 0; i < NUM_VERTS_X - 1; i++)
-	{
-		for (int j = 0; j < NUM_VERTS_Y - 1; j++)
-		{
-			gIndices[index++] = j * NUM_VERTS_X + i;
-			gIndices[index++] = j * NUM_VERTS_X + i + 1;
-			gIndices[index++] = (j + 1) * NUM_VERTS_X + i + 1;
-			gIndices[index++] = j * NUM_VERTS_X + i;
-			gIndices[index++] = (j + 1) * NUM_VERTS_X + i + 1;
-			gIndices[index++] = (j + 1) * NUM_VERTS_X + i;
-		}
-	}
-
-	m_indexVertexArrays = new btTriangleIndexVertexArray(totalTriangles,
-		gIndices,
-		indexStride,
-		totalVerts,(btScalar*) &m_vertices[0].x(),vertStride);
-
-	bool useQuantizedAabbCompression = true;
-	groundShape = new btBvhTriangleMeshShape(m_indexVertexArrays,useQuantizedAabbCompression);
-	
-	tr.setOrigin(btVector3(0,0.f,0));
-
-	m_collisionShapes.push_back(groundShape);
-
-	//********************************************************************
-
-	//CreateTerrain(tr, groundShape);
-	//create ground object
-	localCreateRigidBody(0, tr, groundShape);
-	tr.setOrigin(btVector3(0,0,0));
-
-	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.f,0.5f,2.f));
-	m_collisionShapes.push_back(chassisShape);
-
-	btCompoundShape* compound = new btCompoundShape();
-	m_collisionShapes.push_back(compound);
-	btTransform localTrans;
-	localTrans.setIdentity();
-	//localTrans effectively shifts the center of mass with respect to the chassis
-	localTrans.setOrigin(btVector3(0,1,0));
-
-	compound->addChildShape(localTrans,chassisShape);
-
-	tr.setOrigin(btVector3(0,0.f,0));
-
-	m_carChassis = localCreateRigidBody(800,tr,compound);//chassisShape);
-	
-	m_wheelShape = new btCylinderShapeX(btVector3(wheelWidth,wheelRadius,wheelRadius));
-
-	ResetVehicle();
-
-	CreateVehicle();
-}
-
 void VehiclePhysic::CreateVehicle()
 {
 	m_vehicleRayCaster = new btDefaultVehicleRaycaster(m_dynamicsWorld);
@@ -293,7 +239,6 @@ void VehiclePhysic::CreateVehicle()
         wheel.m_frictionSlip = wheelFriction;
         wheel.m_rollInfluence = rollInfluence;
     }
-
 }
 
 void VehiclePhysic::ResetVehicle()
@@ -312,24 +257,6 @@ void VehiclePhysic::ResetVehicle()
 			m_vehicle->updateWheelTransform(i,true);
 		}
 	}
-
-}
-
-void VehiclePhysic::CreateTerrain(btTransform tr, btCollisionShape* groundShape)
-{
-	m_indexVertexArrays = new btTriangleIndexVertexArray(totalTriangles,
-		gIndices,
-		indexStride,
-		totalVerts,
-		(btScalar*) firstElement,
-		vertStride);
-
-	bool useQuantizedAabbCompression = true;
-	groundShape = new btBvhTriangleMeshShape(m_indexVertexArrays,useQuantizedAabbCompression);
-	
-	tr.setOrigin(btVector3(0,0.f,0));
-
-	m_collisionShapes.push_back(groundShape);
 }
 
 void VehiclePhysic::MoveVehicle()
@@ -353,24 +280,7 @@ void VehiclePhysic::MoveVehicle()
 
 	if (m_dynamicsWorld)
 	{
-		int numSimSteps = m_dynamicsWorld->stepSimulation(dt, 100);
-
-//#define VERBOSE_FEEDBACK
-#ifdef VERBOSE_FEEDBACK
-		if (!numSimSteps)
-			printf("Interpolated transforms\n");
-		else
-		{
-			if (numSimSteps > maxSimSubSteps)
-			{
-				//detect dropping frames
-				printf("Dropped (%i) simulation steps out of %i\n",numSimSteps - maxSimSubSteps,numSimSteps);
-			} else
-			{
-				printf("Simulated (%i) steps\n",numSimSteps);
-			}
-		}
-#endif //VERBOSE_FEEDBACK
+		int numSimSteps = m_dynamicsWorld->stepSimulation(dt, 2);
 	}	
 
 	btScalar m[16];
@@ -486,19 +396,12 @@ btRigidBody* VehiclePhysic::localCreateRigidBody(float mass, const btTransform& 
 
 	//using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
 
-#define USE_MOTIONSTATE 1
-#ifdef USE_MOTIONSTATE
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
 
 	btRigidBody::btRigidBodyConstructionInfo cInfo(mass,myMotionState,shape,localInertia);
 
 	btRigidBody* body = new btRigidBody(cInfo);
 	body->setContactProcessingThreshold(m_defaultContactProcessingThreshold);
-
-#else
-	btRigidBody* body = new btRigidBody(mass,0,shape,localInertia);
-	body->setWorldTransform(startTransform);
-#endif//
 
 	m_dynamicsWorld->addRigidBody(body);
 
@@ -535,9 +438,144 @@ btDynamicsWorld* VehiclePhysic::GetDynamicsWorld()
 
 
 
-
-
 //USED ONLY FOR DEBUG! DO NOT CHANGE
+
+void VehiclePhysic::initPhysics()
+{
+	m_collisionConfiguration = new btDefaultCollisionConfiguration();
+	m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
+	btVector3 worldMin(-1000,-1000,-1000);
+	btVector3 worldMax(1000,1000,1000);
+	m_overlappingPairCache = new btAxisSweep3(worldMin,worldMax);
+	m_constraintSolver = new btSequentialImpulseConstraintSolver();
+	m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher,m_overlappingPairCache,m_constraintSolver,m_collisionConfiguration);
+
+	btCollisionShape* groundShape = new btBoxShape(btVector3(400,3,400));
+	m_collisionShapes.push_back(groundShape);
+
+	btTransform tr;
+	tr.setIdentity();
+	tr.setOrigin(btVector3(0,-3.f,0));
+
+	// Create Mesh **********************************************
+	const float TRIANGLE_SIZE=20.f;
+
+	//create a triangle mesh ground
+	int vertStride = sizeof(btVector3);
+	int indexStride = 3 * sizeof(int);
+
+	const int NUM_VERTS_X = 20;
+	const int NUM_VERTS_Y = 20;
+	const int totalVerts = NUM_VERTS_X*NUM_VERTS_Y;
+	const int totalTriangles = 2 * (NUM_VERTS_X - 1) * (NUM_VERTS_Y - 1);
+
+	m_vertices = new btVector3[totalVerts];
+	int* gIndices = new int[totalTriangles*3];
+
+	for(int i = 0; i < NUM_VERTS_X; i++)
+	{
+		for (int j = 0; j < NUM_VERTS_Y; j++)
+		{
+			float wl = 0.2f;
+			float height = 60.f*sinf(float(i)*wl)*cosf(float(j)*wl);//0.0f;
+
+			m_vertices[i + j * NUM_VERTS_X].setValue(
+				(i - NUM_VERTS_X * 0.5f) * TRIANGLE_SIZE,
+				height,
+				(j - NUM_VERTS_Y * 0.5f) * TRIANGLE_SIZE
+				);
+		}
+	}
+
+	int index = 0;
+	for(int i = 0; i < NUM_VERTS_X - 1; i++)
+	{
+		for (int j = 0; j < NUM_VERTS_Y - 1; j++)
+		{
+			gIndices[index++] = j * NUM_VERTS_X + i;
+			gIndices[index++] = j * NUM_VERTS_X + i + 1;
+			gIndices[index++] = (j + 1) * NUM_VERTS_X + i + 1;
+			gIndices[index++] = j * NUM_VERTS_X + i;
+			gIndices[index++] = (j + 1) * NUM_VERTS_X + i + 1;
+			gIndices[index++] = (j + 1) * NUM_VERTS_X + i;
+		}
+	}
+
+	m_indexVertexArrays = new btTriangleIndexVertexArray(totalTriangles,
+		gIndices,
+		indexStride,
+		totalVerts,(btScalar*) &m_vertices[0].x(),vertStride);
+
+	bool useQuantizedAabbCompression = true;
+	groundShape = new btBvhTriangleMeshShape(m_indexVertexArrays,useQuantizedAabbCompression);
+	
+	tr.setOrigin(btVector3(0,0.f,0));
+
+	m_collisionShapes.push_back(groundShape);
+
+	//********************************************************************
+
+	//CreateTerrain(tr, groundShape);
+	//create ground object
+	localCreateRigidBody(0, tr, groundShape);
+	tr.setOrigin(btVector3(0,0,0));
+
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.f,0.5f,2.f));
+	m_collisionShapes.push_back(chassisShape);
+
+	btCompoundShape* compound = new btCompoundShape();
+	m_collisionShapes.push_back(compound);
+	btTransform localTrans;
+	localTrans.setIdentity();
+	//localTrans effectively shifts the center of mass with respect to the chassis
+	localTrans.setOrigin(btVector3(0,1,0));
+
+	compound->addChildShape(localTrans,chassisShape);
+
+	tr.setOrigin(btVector3(0,0.f,0));
+
+	m_carChassis = localCreateRigidBody(800,tr,compound);//chassisShape);
+	
+	m_wheelShape = new btCylinderShapeX(btVector3(wheelWidth,wheelRadius,wheelRadius));
+
+	ResetVehicle();
+
+	CreateVehicle();
+}
+
+VehiclePhysic::VehiclePhysic() : 
+m_carChassis(0),
+m_vertices(0),
+m_cameraHeight(4.f),
+m_minCameraDistance(3.f),
+m_maxCameraDistance(10.f),
+gEngineForce(0.f),
+gBreakingForce(0.f),
+maxEngineForce(2000.f),//this should be engine/velocity dependent
+maxBreakingForce(200.f),
+gVehicleSteering(0.f),
+steeringIncrement(0.04f),
+steeringClamp(0.3f),
+wheelRadius(0.5f),
+wheelWidth(0.2f),
+wheelFriction(1000),//BT_LARGE_
+suspensionStiffness(20.f),
+suspensionDamping(2.3f),
+suspensionCompression(4.4f),
+rollInfluence(0.1f),//1.0f;
+suspensionRestLength(0.6)
+{
+	m_vehicle = 0;
+	m_wheelShape = 0;
+	m_cameraPosition = btVector3(30,30,30);
+	initPhysics();
+	for (int i = 0; i < 16; ++i)
+	{
+		carPosRot[i] = 0.0;
+		if(i % 5 == 0)
+			carPosRot[i] = 1.0;
+	}
+}
 
 //to be implemented by the demo
 void VehiclePhysic::renderme()
@@ -612,36 +650,10 @@ void VehiclePhysic::clientMoveAndDisplay()
 
 		int numSimSteps = m_dynamicsWorld->stepSimulation(dt,maxSimSubSteps);
 		
-
-//#define VERBOSE_FEEDBACK
-#ifdef VERBOSE_FEEDBACK
-		if (!numSimSteps)
-			printf("Interpolated transforms\n");
-		else
-		{
-			if (numSimSteps > maxSimSubSteps)
-			{
-				//detect dropping frames
-				printf("Dropped (%i) simulation steps out of %i\n",numSimSteps - maxSimSubSteps,numSimSteps);
-			} else
-			{
-				printf("Simulated (%i) steps\n",numSimSteps);
-			}
-		}
-#endif //VERBOSE_FEEDBACK
-
 	}
 
 	
 	
-
-
-
-
-#ifdef USE_QUICKPROF 
-        btProfiler::beginBlock("render"); 
-#endif //USE_QUICKPROF 
-
 
 	renderme(); 
 
@@ -649,17 +661,9 @@ void VehiclePhysic::clientMoveAndDisplay()
 	if (m_dynamicsWorld)
 		m_dynamicsWorld->debugDrawWorld();
 
-#ifdef USE_QUICKPROF 
-        btProfiler::endBlock("render"); 
-#endif 
-	
-
 	glFlush();
 	glutSwapBuffers();
-
 }
-
-
 
 void VehiclePhysic::displayCallback(void) 
 {
@@ -667,15 +671,13 @@ void VehiclePhysic::displayCallback(void)
 
 	renderme();
 
-//optional but useful: debug drawing
+	//optional but useful: debug drawing
 	if (m_dynamicsWorld)
 		m_dynamicsWorld->debugDrawWorld();
 
 	glFlush();
 	glutSwapBuffers();
 }
-
-
 
 void VehiclePhysic::clientResetScene()
 {
@@ -693,10 +695,7 @@ void VehiclePhysic::clientResetScene()
 			m_vehicle->updateWheelTransform(i,true);
 		}
 	}
-
 }
-
-
 
 void VehiclePhysic::specialKeyboardUp(int key, int x, int y)
 {
@@ -727,14 +726,12 @@ void VehiclePhysic::specialKeyboardUp(int key, int x, int y)
 		DemoApplication::specialKeyboardUp(key,x,y);
         break;
     }
-
 }
-
 
 void VehiclePhysic::specialKeyboard(int key, int x, int y)
 {
 
-//	printf("key = %i x=%i y=%i\n",key,x,y);
+	//	printf("key = %i x=%i y=%i\n",key,x,y);
 
     switch (key) 
     {
@@ -771,21 +768,12 @@ void VehiclePhysic::specialKeyboard(int key, int x, int y)
         break;
     }
 
-//	glutPostRedisplay();
-
-
+	glutPostRedisplay();
 }
-
-
 
 void	VehiclePhysic::updateCamera()
 {
-	
-//#define DISABLE_CAMERA 1
-#ifdef DISABLE_CAMERA
-	DemoApplication::updateCamera();
-	return;
-#endif //DISABLE_CAMERA
+
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -796,12 +784,7 @@ void	VehiclePhysic::updateCamera()
 	m_carChassis->getMotionState()->getWorldTransform(chassisWorldTrans);
 	m_cameraTargetPosition = chassisWorldTrans.getOrigin();
 
-	//interpolate the camera height
-#ifdef FORCE_ZAXIS_UP
-	m_cameraPosition[2] = (15.0*m_cameraPosition[2] + m_cameraTargetPosition[2] + m_cameraHeight)/16.0;
-#else
 	m_cameraPosition[1] = (15.0*m_cameraPosition[1] + m_cameraTargetPosition[1] + m_cameraHeight)/16.0;
-#endif 
 
 	btVector3 camToObject = m_cameraTargetPosition - m_cameraPosition;
 
@@ -827,7 +810,4 @@ void	VehiclePhysic::updateCamera()
     gluLookAt(m_cameraPosition[0],m_cameraPosition[1],m_cameraPosition[2],
                       m_cameraTargetPosition[0],m_cameraTargetPosition[1], m_cameraTargetPosition[2],
                           m_cameraUp.getX(),m_cameraUp.getY(),m_cameraUp.getZ());
-
-
-
 }

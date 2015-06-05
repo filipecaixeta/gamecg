@@ -9,6 +9,7 @@ class btCollisionShape;
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 
 #include <glm/glm.hpp>
+#include <scenario.h>
 
 #include "GlutDemoApplication.h"
 
@@ -62,7 +63,7 @@ public:
 	btCollisionShape*	m_wheelShape;
 
 	VehiclePhysic();
-	VehiclePhysic(int totalTriangles, int* gIndices, int indexStride, int totalVerts, float* firstElement, int vertStride);
+	VehiclePhysic(Scenario *scene);
 	virtual ~VehiclePhysic();
 	void initPhysics();
 	void KeyDown(int key);
@@ -93,14 +94,6 @@ private:
 
 	CarPos carPos;
 	btScalar carPosRot[16];
-
-	int totalTriangles;
-	int* gIndices;
-	int indexStride;
-	int totalVerts;
-	float* firstElement;
-	int vertStride;
-
 
 	btScalar suspensionRestLength;
 
