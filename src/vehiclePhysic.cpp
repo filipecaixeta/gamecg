@@ -358,7 +358,14 @@ void VehiclePhysic::KeyDown(int key)
 	if(key == KEY_BACK)
 	{			
 		gEngineForce = -maxEngineForce;
-		gBreakingForce = 0.f;
+		if(m_vehicle.getCurrentSpeedKmHour() > 0)
+		{
+			gBreakingForce = 100.0f;
+		}
+		else()
+		{
+			gBreakingForce = 0.0f;
+		}
 	}
 	if(key == KEY_SPACE)
 	{
