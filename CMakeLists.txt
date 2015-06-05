@@ -62,8 +62,8 @@ endif()
 #########################################################
 # FIND SDL 2
 #########################################################
-FIND_LIBRARY(SDL2_LIBRARY SDL2 /usr/local/lib/libSDL2.so)
-FIND_LIBRARY(SDL2_MIXER SDL2_mixer /usr/local/lib/libSDL2_mixer.so)
+FIND_LIBRARY(SDL2_LIBRARY SDL2 /usr/local/lib/libSDL2.so /usr/lib/libSDL2.so)
+FIND_LIBRARY(SDL2_MIXER SDL2_mixer /usr/local/lib/libSDL2_mixer.so  /usr/lib/libSDL2_mixer.so)
 
 
 #########################################################
@@ -75,6 +75,8 @@ ${ASSIMP_INCLUDE_DIRS}
 ${BULLET_PHYSICS_SOURCE_DIR}/src 
 /usr/local/include/bullet
 /usr/local/include/SDL2
+/usr/include/bullet
+/usr/include/SDL2
 )
 
 #########################################################

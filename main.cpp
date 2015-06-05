@@ -232,8 +232,6 @@ void init()
 	// Load the scenario mesh
 	scenario = new Scenario(baseDir+"3dModels/city7/city.obj");
 
-	std::cerr << "SHADERS" << std::endl;
-
 	// Load one car mesh
 	for (int carNr: carsList)
 	{
@@ -253,6 +251,8 @@ void init()
 	tmp->loadFile(baseDir+"sound/effect/start.wav");
 	sounds.push_back(tmp);
 }
+
+
 void processSpecialKeys(int key, int , int ) 
 {
 	gkey=key;
