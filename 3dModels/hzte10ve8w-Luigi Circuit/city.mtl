@@ -1,0 +1,252 @@
+# Blender MTL File: 'untitled.blend'
+# Material Count: 23
+
+newmtl Sand_070717b
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.588000 0.230361 0.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\Sand_070717b.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\Sand_070717b.tga
+
+newmtl bc_kankyaku_mip
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.102473 0.102473 0.102473
+Ks 0.500000 0.500000 0.500000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\bc_kankyaku_mip.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\bc_kankyaku_mip.tga
+
+newmtl bc_spot1
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\bc_spot1.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\bc_spot1.tga
+
+newmtl ef_rainbowRed2
+Ns 90.196078
+Ka 0.000000 0.000000 0.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.333333 0.333333 0.333333
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\ef_rainbowRed2.tga
+
+newmtl enkei_yama
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.588000 0.481588 0.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd H:\Programs\WII exporter\brres files\Beginner\enkei_yama.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\enkei_yama.tga
+
+newmtl hana
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.588000 0.489988 0.000000
+Ks 0.592577 0.592577 0.592577
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\hana.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\hana.tga
+
+newmtl lc_EleArrowALL
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_EleArrowALL.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_EleArrowALL.tga
+
+newmtl lc_ami
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.207916 0.207916 0.207916
+Ks 1.000000 1.000000 1.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_ami.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_ami.tga
+
+newmtl lc_block_wall_mip
+Ns 35.294118
+Ka 0.000000 0.000000 0.000000
+Kd 0.495048 0.588000 0.000000
+Ks 0.358333 0.358333 0.358333
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_block_wall_mip.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_block_wall_mip.tga
+
+newmtl lc_comp1a_070709_128x256a
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_comp1a_070709_128x256a.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_comp1a_070709_128x256a.tga
+
+newmtl lc_kakyutest_1
+Ns 31.372549
+Ka 0.000000 0.000000 0.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.483333 0.483333 0.483333
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_kakyutest.1.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_kakyutest.1.tga
+
+newmtl lc_kinoko_mip
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.588000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_kinoko_mip.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_kinoko_mip.tga
+
+newmtl lc_kusa_kanban_mip
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.638270 0.638270 0.638270
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_kusa_kanban_mip.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_kusa_kanban_mip.tga
+
+newmtl lc_lake
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.327100 0.588000
+Ks 0.344262 0.344262 0.344262
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_lake.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_lake.tga
+
+newmtl lc_popAll_128x1024_mip
+Ns 25.490196
+Ka 0.000000 0.000000 0.000000
+Kd 0.318539 0.318539 0.318539
+Ks 0.691667 0.691667 0.691667
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_popAll_128x1024_mip.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_popAll_128x1024_mip.tga
+
+newmtl lc_tatemonoall_071123mip_a
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.076580 0.076580 0.076580
+Ks 0.133333 0.133333 0.133333
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\lc_tatemonoall_071123mip_a.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\lc_tatemonoall_071123mip_a.tga
+
+newmtl luigi_capall_070607a
+Ns 168.627451
+Ka 0.000000 0.000000 0.000000
+Kd 0.020337 1.000000 0.033637
+Ks 0.775000 0.775000 0.775000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\luigi_capall_070607a.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\luigi_capall_070607a.tga
+
+newmtl mainROAD_all_mip
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.023651 0.023651 0.023651
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd H:\Programs\WII exporter\brres files\Beginner\mainROAD_all_mip.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\mainROAD_all_mip.tga
+
+newmtl t_kusa_070712c
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.240100 0.005442
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd H:\Programs\WII exporter\brres files\Beginner\t_kusa_070712c.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\t_kusa_070712c.tga
+
+newmtl t_tree_otubo
+Ns 62.745098
+Ka 0.000000 0.000000 0.000000
+Kd 0.007562 0.588000 0.000000
+Ks 0.230016 0.230016 0.230016
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\t_tree_otubo.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\t_tree_otubo.tga
+
+newmtl t_waki_070712a_mip
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.000465 0.127400 0.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd H:\Programs\WII exporter\brres files\Beginner\t_waki_070712a_mip.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\t_waki_070712a_mip.tga
+
+newmtl wire_174186203
+Ns 29.411765
+Ka 0.000000 0.000000 0.000000
+Kd 0.545920 0.583520 0.636880
+Ks 0.350000 0.350000 0.350000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl yama
+Ns 47.058824
+Ka 0.000000 0.000000 0.000000
+Kd 0.502686 0.588000 0.000000
+Ks 0.350000 0.350000 0.350000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd H:\Programs\WII exporter\brres files\Beginner\yama.tga
+map_Ka H:\\Programs\\WII exporter\\brres files\\Beginner\\yama.tga
