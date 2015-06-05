@@ -411,7 +411,6 @@ void VehiclePhysic::KeyDown(int key)
 	{
 		gBreakingForce = maxBreakingForce;
 		gEngineForce = 0.0;
-		gVehicleSteering = 0.0;
 	}
 }
 
