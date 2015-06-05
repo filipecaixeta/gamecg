@@ -61,6 +61,7 @@ mat4 moveCar(1.0f);
 int gkey=0;
 int speedKey=0;
 int directionKey=0;
+int brakeKey = 0;
 int cameraMode=1;
 float carang=0.0;
 float carang2=0.0;
@@ -209,6 +210,15 @@ void displayWin()
 			MainCar->KeyUp(KEY_LEFT);
 	}
 
+	if(brakeKey)
+	{
+		MainCar->KeyDown(KEY_SPACE);
+	}
+	else
+	{
+		MainCar->KeyUp(KEY_SPACE);
+	}
+
 	MainCar->MoveVehicle();
 
 	for (int carNr: carsList)
@@ -328,6 +338,12 @@ void keyBorardFunc(unsigned char key, int, int)
 		case 'p':
 			directionKey=GLUT_KEY_LEFT;
 			break;
+		case 'r':
+			MainCar->ResetVehicle();
+			break;
+		case ' ':
+			brakeKey = 1;
+			break;
 	}
 	if (key=='p')
 	{
@@ -349,6 +365,9 @@ void keyBorardUpFunc(unsigned char key, int, int)
 		case 'd':
 		case 'a':
 			directionKey=0;
+			break;
+		case ' ':
+			brakeKey = 0;
 			break;
 	}
 }

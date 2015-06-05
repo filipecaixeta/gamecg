@@ -7,6 +7,15 @@ class btCollisionShape;
 
 #include "BulletDynamics/Vehicle/btRaycastVehicle.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
+#include "BulletCollision/CollisionShapes/btCollisionShape.h"
+#include "BulletCollision/CollisionShapes/btBoxShape.h"
+#include "BulletCollision/CollisionShapes/btSphereShape.h"
+#include "BulletCollision/CollisionShapes/btCompoundShape.h"
+#include "BulletCollision/CollisionShapes/btUniformScalingShape.h"
+#include "BulletDynamics/ConstraintSolver/btConstraintSolver.h"
+#include "LinearMath/btQuickprof.h"
+#include "LinearMath/btDefaultMotionState.h"
+#include "LinearMath/btSerializer.h"
 
 #include <glm/glm.hpp>
 
@@ -73,48 +82,7 @@ public:
 	glm::mat4 GetVehicleMatrix();
 	btDynamicsWorld* GetDynamicsWorld();
 
-private:
-	///this is the most important class
-	//TODO: Maybe move this to a physics class
-	/*btDynamicsWorld*	m_dynamicsWorld;
-	btScalar			m_defaultContactProcessingThreshold;*/
 
-	float	gEngineForce;
-	float	gBreakingForce;
-
-	float	maxEngineForce;
-	float	maxBreakingForce;
-
-	float	gVehicleSteering;
-	float	steeringIncrement;
-	float	steeringClamp; 
-	float	wheelRadius; 
-	float	wheelWidth; 
-	float	wheelFriction;
-	float	suspensionStiffness; 
-	float	suspensionDamping; 
-	float	suspensionCompression; 
-	float	rollInfluence;
-
-	CarPos carPos;
-	btScalar carPosRot[16];
-
-	int totalTriangles;
-	int* gIndices;
-	int indexStride;
-	int totalVerts;
-	float* firstElement;
-	int vertStride;
-
-
-	btScalar suspensionRestLength;
-
-	void CreateVehicle();
-	btRigidBody*	localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape);
-
-
-//FOR DEBUG ONLY. DO NOT CHANGE
-public:
 	float		m_cameraHeight;
 
 	float	m_minCameraDistance;
@@ -142,6 +110,45 @@ public:
 		demo->initPhysics();
 		return demo;
 	}
+
+private:
+	///this is the most important class
+	//TODO: Maybe move this to a physics class
+	/*btDynamicsWorld*	m_dynamicsWorld;
+	btScalar			m_defaultContactProcessingThreshold;*/
+
+	float	gEngineForce;
+	float	gBreakingForce;
+
+	float	maxEngineForce;//this should be engine/velocity dependent
+	float	maxBreakingForce;
+
+	float	gVehicleSteering;
+	float	steeringIncrement;
+	float	steeringClamp;
+	float	wheelRadius;
+	float	wheelWidth;
+	float	wheelFriction;//BT_LARGE_FLOAT;
+	float	suspensionStiffness;
+	float	suspensionDamping;
+	float	suspensionCompression;
+	float	rollInfluence;//1.0f;
+
+	CarPos carPos;
+	btScalar carPosRot[16];
+
+	int totalTriangles;
+	int* gIndices;
+	int indexStride;
+	int totalVerts;
+	float* firstElement;
+	int vertStride;
+
+
+	btScalar suspensionRestLength;
+
+	void CreateVehicle();
+	btRigidBody*	localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape);
 };
 
 

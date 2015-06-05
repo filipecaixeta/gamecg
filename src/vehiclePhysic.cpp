@@ -32,7 +32,22 @@ gIndices(0),
 indexStride(0),
 totalVerts(0),
 firstElement(0),
-vertStride(0)
+vertStride(0),
+gEngineForce(0.f),
+gBreakingForce(0.f),
+maxEngineForce(2000.f),//this should be engine/velocity dependent
+maxBreakingForce(200.f),
+gVehicleSteering(0.f),
+steeringIncrement(0.04f),
+steeringClamp(0.3f),
+wheelRadius(0.5f),
+wheelWidth(0.2f),
+wheelFriction(1000),//BT_LARGE_
+suspensionStiffness(20.f),
+suspensionDamping(2.3f),
+suspensionCompression(4.4f),
+rollInfluence(0.1f),//1.0f;
+suspensionRestLength(0.6)
 {
 	m_vehicle = 0;
 	m_wheelShape = 0;
@@ -44,24 +59,6 @@ vertStride(0)
 		if(i % 5 == 0)
 			carPosRot[i] = 1.0;
 	}
-
-	//Car Constraints
-	gEngineForce = 0.f;
-	gBreakingForce = 0.f;
-
-	maxEngineForce = 3000.f;//this should be engine/velocity dependent
-	maxBreakingForce = 200.f;
-
-	gVehicleSteering = 0.f;
-	steeringIncrement = 0.08f;
-	steeringClamp = 0.4f;
-	wheelRadius = 0.5f;
-	wheelWidth = 0.2f;
-	wheelFriction = 1000;//BT_LARGE_FLOAT;
-	suspensionStiffness = 20.f;
-	suspensionDamping = 2.3f;
-	suspensionCompression = 4.4f;
-	rollInfluence = 0.1f;//1.0f;
 }
 
 VehiclePhysic::VehiclePhysic(int totalTriangles, int* gIndices, int indexStride, int totalVerts, float* firstElement, int vertStride) : 
@@ -75,7 +72,22 @@ gIndices(gIndices),
 indexStride(indexStride),
 totalVerts(totalVerts),
 firstElement(firstElement),
-vertStride(vertStride)
+vertStride(vertStride),
+gEngineForce(0.f),
+gBreakingForce(0.f),
+maxEngineForce(2000.f),//this should be engine/velocity dependent
+maxBreakingForce(200.f),
+gVehicleSteering(0.f),
+steeringIncrement(0.04f),
+steeringClamp(0.3f),
+wheelRadius(0.5f),
+wheelWidth(0.2f),
+wheelFriction(1000),//BT_LARGE_
+suspensionStiffness(20.f),
+suspensionDamping(2.3f),
+suspensionCompression(4.4f),
+rollInfluence(0.1f),//1.0f;
+suspensionRestLength(0.6)
 {
 	m_vehicle = 0;
 	m_wheelShape = 0;
@@ -87,24 +99,6 @@ vertStride(vertStride)
 		if(i % 5 == 0)
 			carPosRot[i] = 1.0;
 	}
-
-	//Car Constraints
-	gEngineForce = 0.f;
-	gBreakingForce = 0.f;
-
-	maxEngineForce = 3000.f;//this should be engine/velocity dependent
-	maxBreakingForce = 200.f;
-
-	gVehicleSteering = 0.f;
-	steeringIncrement = 0.08f;
-	steeringClamp = 0.4f;
-	wheelRadius = 0.5f;
-	wheelWidth = 0.2f;
-	wheelFriction = 1000;//BT_LARGE_FLOAT;
-	suspensionStiffness = 20.f;
-	suspensionDamping = 2.3f;
-	suspensionCompression = 4.4f;
-	rollInfluence = 0.1f;//1.0f;
 }
 
 VehiclePhysic::~VehiclePhysic()
@@ -250,11 +244,8 @@ void VehiclePhysic::initPhysics()
 	tr.setOrigin(btVector3(0,0.f,0));
 
 	m_carChassis = localCreateRigidBody(800,tr,compound);//chassisShape);
-	//m_carChassis->setDamping(0.2,0.2);
 	
 	m_wheelShape = new btCylinderShapeX(btVector3(wheelWidth,wheelRadius,wheelRadius));
-
-	//m_collisionShapes.push_back(m_wheelShape);
 
 	ResetVehicle();
 
@@ -271,7 +262,7 @@ void VehiclePhysic::CreateVehicle()
 
 	m_dynamicsWorld->addVehicle(m_vehicle);
 
-	float connectionHeight = 0.6f;
+	float connectionHeight = 1.2f;
 
 	bool isFrontWheel=true;
 
@@ -362,7 +353,7 @@ void VehiclePhysic::MoveVehicle()
 
 	if (m_dynamicsWorld)
 	{
-		int numSimSteps = m_dynamicsWorld->stepSimulation(1.0f / 60.0f, 10, 1.0f / 60.0f);
+		int numSimSteps = m_dynamicsWorld->stepSimulation(dt, 100);
 
 //#define VERBOSE_FEEDBACK
 #ifdef VERBOSE_FEEDBACK
@@ -640,12 +631,27 @@ void VehiclePhysic::clientMoveAndDisplay()
 #endif //VERBOSE_FEEDBACK
 
 	}
+
+	
+	
+
+
+
+
+#ifdef USE_QUICKPROF 
+        btProfiler::beginBlock("render"); 
+#endif //USE_QUICKPROF 
+
+
 	renderme(); 
 
 	//optional but useful: debug drawing
 	if (m_dynamicsWorld)
 		m_dynamicsWorld->debugDrawWorld();
 
+#ifdef USE_QUICKPROF 
+        btProfiler::endBlock("render"); 
+#endif 
 	
 
 	glFlush();
