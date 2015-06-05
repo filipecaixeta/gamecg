@@ -112,6 +112,9 @@ set(SOURCES
 	src/vehiclePhysic.cpp
 	src/DemoApplication.cpp
 	src/GlutDemoApplication.cpp
+	src/SFX.cpp
+	src/music.cpp
+	src/chunk.cpp
 	src/stb_image.c)
 
 add_executable(${PROJECT_NAME} main.cpp ${SOURCES})
