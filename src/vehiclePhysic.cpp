@@ -130,7 +130,10 @@ suspensionRestLength(0.6)
 	}
 
 	//Start Sounds
-
+	Chunk *tmp;
+	tmp = new Chunk(22050);
+	tmp->loadFile("../sound/effect/start1.wav");
+	effect.push_back(tmp);
 }
 
 VehiclePhysic::~VehiclePhysic()
@@ -351,12 +354,12 @@ void VehiclePhysic::MoveVehicle()
 		m_vehicle->updateWheelTransform(i,true);
 
 		m_vehicle->getWheelInfo(i).m_worldTransform.getOpenGLMatrix(m);
-
-		/*carPos.wheels[i].pos = glm::vec3(
+		transWheels = m_vehicle->getWheelTransformWS(i);
+		carPos.wheels[i].pos = glm::vec3(
 			transWheels.getOrigin().getX(),
 			transWheels.getOrigin().getY(),
 			transWheels.getOrigin().getZ()
-			);*/
+			);
 
 
 		AngleX = atan2f(m[1], m[5]);  // 
@@ -396,6 +399,10 @@ void VehiclePhysic::KeyDown(int key)
 		gEngineForce = maxEngineForce - m_vehicle->getCurrentSpeedKmHour() * 50.0;
 		if(gEngineForce < 2000.0f)
 			gEngineForce = 2000.0f;
+		if(m_vehicle->getCurrentSpeedKmHour() < 2.0)
+		{
+			effect[0]->playSound();
+		}
 		gBreakingForce = 0.f;
 	}
 	if(key == KEY_BACK)
