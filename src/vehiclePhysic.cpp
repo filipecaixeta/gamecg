@@ -20,6 +20,7 @@ const int maxProxies = 32766;
 const int maxOverlap = 65535;
 
 #define CUBE_HALF_EXTENT 1
+#define BREAKING_THRESHOLD 10
 
 VehiclePhysic::VehiclePhysic(Scenario *scenario,Car *car): 
 m_carChassis(0),
@@ -135,6 +136,11 @@ suspensionRestLength(0.6)
 	Chunk *tmp;
 	tmp = new Chunk();
 	tmp->loadFile("../sound/effect/acceleratingMain.wav");
+	tmp->changeVolume(6, 70);
+	effect.push_back(tmp);
+	tmp = new Chunk();
+	tmp->loadFile("../sound/effect/brake1.wav");
+	tmp->changeVolume(5, 70);
 	effect.push_back(tmp);
 }
 
@@ -273,13 +279,33 @@ void VehiclePhysic::MoveVehicle()
 		m_vehicle->setSteeringValue(gVehicleSteering,wheelIndex);
 	}
 
+	//Sound Without press key
+	if(!(effect[0]->isPlaying(6)) && m_vehicle->getCurrentSpeedKmHour() > 50.0)
+	{
+		effect[0]->playSound(LOOPING, 6);
+	}
+	if((effect[0]->isPlaying(6)) && m_vehicle->getCurrentSpeedKmHour() < 30.0)
+	{
+		effect[0]->stopSound(6);
+	}
+
+	if((effect[1]->isPlaying(5)) && m_vehicle->getCurrentSpeedKmHour() < 15.0)
+	{
+		effect[1]->stopSound(5);
+	}
+
 	std::cout << "KmHour: " << m_vehicle->getCurrentSpeedKmHour() << std::endl;
+	if(accel.size() == 30)
+	{
+		accel.pop();
+	}
+	accel.push(m_vehicle->getCurrentSpeedKmHour());
 
 	float dt = 0.0166666f;	//60FPS
 
 	if (m_dynamicsWorld)
 	{
-		int numSimSteps = m_dynamicsWorld->stepSimulation(dt, 2);
+		int numSimSteps = m_dynamicsWorld->stepSimulation(dt, 10);
 	}	
 
 	btScalar m[16];
@@ -363,9 +389,9 @@ void VehiclePhysic::KeyDown(int key)
 		gEngineForce = maxEngineForce - m_vehicle->getCurrentSpeedKmHour() * 50.0;
 		if(gEngineForce < 2000.0f)
 			gEngineForce = 2000.0f;
-		if(m_vehicle->getCurrentSpeedKmHour() < 10.0 && !(effect[0]->isPlaying()))
+		if(!(effect[0]->isPlaying(6)))
 		{
-			effect[0]->playSound(LOOPING);
+			effect[0]->playSound(LOOPING, 6);
 		}
 		gBreakingForce = 0.f;
 	}
@@ -383,7 +409,12 @@ void VehiclePhysic::KeyDown(int key)
 	}
 	if(key == KEY_SPACE)
 	{
-		effect[0]->stopSound();
+		if (accel.front() - accel.back() > BREAKING_THRESHOLD)
+		{
+			effect[0]->stopSound(6);
+			if(!(effect[1]->isPlaying(5)))
+				effect[1]->playSound(ONCE, 5);
+		}
 		gBreakingForce = maxBreakingForce;
 		gEngineForce = 0.0;
 	}
@@ -401,6 +432,7 @@ void VehiclePhysic::KeyUp(int key)
 	}
 	if(key == KEY_SPACE)
 	{
+		effect[1]->stopSound(5);
 		gBreakingForce = 0.0;
 	}
 }

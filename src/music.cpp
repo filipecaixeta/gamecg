@@ -4,14 +4,6 @@ Music::Music()
 {
 	// TODO Auto-generated constructor stub
 	music = NULL;
-	channel = 0;
-}
-
-Music::Music(int channel) : SFX(channel) 
-{
-	// TODO Auto-generated constructor stub
-	music = NULL;
-	channel = 0;
 }
 
 Music::~Music() {
@@ -48,5 +40,5 @@ int Music::isPaused() {
 
 void Music::changeVolume(int volume)
 {
-	SFX::changeVolume(volume);
+	Mix_VolumeMusic(volume);
 }

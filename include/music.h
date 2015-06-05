@@ -8,7 +8,6 @@ private:
 	Mix_Music* music;
 public:
 	Music();
-	Music(int);
 	virtual ~Music();
 	void loadFile(string);
 	void playSound();
