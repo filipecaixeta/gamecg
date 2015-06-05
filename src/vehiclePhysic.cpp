@@ -186,49 +186,6 @@ VehiclePhysic::~VehiclePhysic()
 	delete m_collisionConfiguration;
 }
 
-void VehiclePhysic::CreateVehicle()
-{
-	m_vehicleRayCaster = new btDefaultVehicleRaycaster(m_dynamicsWorld);
-	m_vehicle = new btRaycastVehicle(m_tuning,m_carChassis,m_vehicleRayCaster);
-	
-	///never deactivate the vehicle
-	m_carChassis->setActivationState(DISABLE_DEACTIVATION);
-
-	m_dynamicsWorld->addVehicle(m_vehicle);
-
-	float connectionHeight = 1.2f;
-
-	bool isFrontWheel=true;
-
-	//choose coordinate system
-	m_vehicle->setCoordinateSystem(rightIndex,upIndex,forwardIndex);
-
-	// add wheels
-    // front left
-    btVector3 connectionPointCS0(CUBE_HALF_EXTENT-(0.3*wheelWidth), connectionHeight, 2*CUBE_HALF_EXTENT-wheelRadius);
-    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
-    // front right
-    connectionPointCS0 = btVector3(-CUBE_HALF_EXTENT+(0.3*wheelWidth), connectionHeight, 2*CUBE_HALF_EXTENT-wheelRadius);
-    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
-    isFrontWheel = false;
-    // rear right
-    connectionPointCS0 = btVector3(-CUBE_HALF_EXTENT+(0.3*wheelWidth), connectionHeight, -2*CUBE_HALF_EXTENT+wheelRadius);
-    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
-    // rear left
-    connectionPointCS0 = btVector3(CUBE_HALF_EXTENT-(0.3*wheelWidth), connectionHeight, -2*CUBE_HALF_EXTENT+wheelRadius);
-    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
-	
-	for (int i = 0; i < m_vehicle->getNumWheels(); i++)
-    {
-        btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
-        wheel.m_suspensionStiffness = suspensionStiffness;
-        wheel.m_wheelsDampingRelaxation = suspensionDamping;
-        wheel.m_wheelsDampingCompression = suspensionCompression;
-        wheel.m_frictionSlip = wheelFriction;
-        wheel.m_rollInfluence = rollInfluence;
-    }
-}
-
 void VehiclePhysic::CreateVehicle(Car *car)
 {
 	m_vehicleRayCaster = new btDefaultVehicleRaycaster(m_dynamicsWorld);
@@ -637,6 +594,49 @@ suspensionRestLength(1.0)
 		if(i % 5 == 0)
 			carPosRot[i] = 1.0;
 	}
+}
+
+void VehiclePhysic::CreateVehicle()
+{
+	m_vehicleRayCaster = new btDefaultVehicleRaycaster(m_dynamicsWorld);
+	m_vehicle = new btRaycastVehicle(m_tuning,m_carChassis,m_vehicleRayCaster);
+	
+	///never deactivate the vehicle
+	m_carChassis->setActivationState(DISABLE_DEACTIVATION);
+
+	m_dynamicsWorld->addVehicle(m_vehicle);
+
+	float connectionHeight = 1.2f;
+
+	bool isFrontWheel=true;
+
+	//choose coordinate system
+	m_vehicle->setCoordinateSystem(rightIndex,upIndex,forwardIndex);
+
+	// add wheels
+    // front left
+    btVector3 connectionPointCS0(CUBE_HALF_EXTENT-(0.3*wheelWidth), connectionHeight, 2*CUBE_HALF_EXTENT-wheelRadius);
+    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+    // front right
+    connectionPointCS0 = btVector3(-CUBE_HALF_EXTENT+(0.3*wheelWidth), connectionHeight, 2*CUBE_HALF_EXTENT-wheelRadius);
+    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+    isFrontWheel = false;
+    // rear right
+    connectionPointCS0 = btVector3(-CUBE_HALF_EXTENT+(0.3*wheelWidth), connectionHeight, -2*CUBE_HALF_EXTENT+wheelRadius);
+    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+    // rear left
+    connectionPointCS0 = btVector3(CUBE_HALF_EXTENT-(0.3*wheelWidth), connectionHeight, -2*CUBE_HALF_EXTENT+wheelRadius);
+    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+	
+	for (int i = 0; i < m_vehicle->getNumWheels(); i++)
+    {
+        btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
+        wheel.m_suspensionStiffness = suspensionStiffness;
+        wheel.m_wheelsDampingRelaxation = suspensionDamping;
+        wheel.m_wheelsDampingCompression = suspensionCompression;
+        wheel.m_frictionSlip = wheelFriction;
+        wheel.m_rollInfluence = rollInfluence;
+    }
 }
 
 //to be implemented by the demo
