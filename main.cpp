@@ -246,8 +246,9 @@ void init()
 
 	MainCar = new VehiclePhysic(scenario,cars[key]);
 
-	music.loadFile(baseDir+"sound/music/mus1.wav");
+	music.loadFile(baseDir+"sound/effect/mus1.wav");
 	music.playSound();
+	music.pauseSound();
 	changeStation.loadFile(baseDir+"sound/music/change.wav");
 }
 
@@ -308,9 +309,6 @@ void keyBoardFunc(unsigned char key, int, int)
 		case 'a':
 			directionKey=GLUT_KEY_LEFT;
 			break;
-		case 'p':
-			directionKey=GLUT_KEY_LEFT;
-			break;
 		case 'r':
 			MainCar->ResetVehicle();
 			break;
@@ -320,8 +318,14 @@ void keyBoardFunc(unsigned char key, int, int)
 		case 'm':
 			changeMusic();
 			break;
+		case 'p':
+			if(music.isPlaying())
+				music.pauseSound();
+			else
+				music.playSound();
+			break;
 	}
-	if (key=='p')
+	if (key=='o')
 	{
 		for (auto& c: cars)
 		{

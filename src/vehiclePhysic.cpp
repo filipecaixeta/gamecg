@@ -114,7 +114,7 @@ suspensionRestLength(0.6)
 
 	tr.setOrigin(btVector3(0.0f,0.0f,0.0f));
 
-	m_carChassis = localCreateRigidBody(800,tr,compound);//chassisShape);
+	m_carChassis = localCreateRigidBody(1000,tr,compound);//chassisShape);
 	
 	m_wheelShape = new btCylinderShapeX(btVector3(wheelWidth,wheelRadius,wheelRadius));
 
@@ -128,6 +128,9 @@ suspensionRestLength(0.6)
 		if(i % 5 == 0)
 			carPosRot[i] = 1.0;
 	}
+
+	//Start Sounds
+
 }
 
 VehiclePhysic::~VehiclePhysic()
