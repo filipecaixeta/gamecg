@@ -7,11 +7,6 @@
 
 // By default, Bullet Vehicle uses Y as up axis.
 
-//either use heightfield or triangle mesh
-#define  USE_TRIMESH_GROUND 1	
-//#define  LOAD_FROM_FILE
-//
-
 int rightIndex = 0;
 int upIndex = 1;
 int forwardIndex = 2;
@@ -37,7 +32,22 @@ gIndices(0),
 indexStride(0),
 totalVerts(0),
 firstElement(0),
-vertStride(0)
+vertStride(0),
+gEngineForce(0.f),
+gBreakingForce(0.f),
+maxEngineForce(2000.f),//this should be engine/velocity dependent
+maxBreakingForce(200.f),
+gVehicleSteering(0.f),
+steeringIncrement(0.04f),
+steeringClamp(0.3f),
+wheelRadius(0.5f),
+wheelWidth(0.2f),
+wheelFriction(1000),//BT_LARGE_
+suspensionStiffness(20.f),
+suspensionDamping(2.3f),
+suspensionCompression(4.4f),
+rollInfluence(0.1f),//1.0f;
+suspensionRestLength(0.6)
 {
 	m_vehicle = 0;
 	m_wheelShape = 0;
@@ -62,7 +72,22 @@ gIndices(gIndices),
 indexStride(indexStride),
 totalVerts(totalVerts),
 firstElement(firstElement),
-vertStride(vertStride)
+vertStride(vertStride),
+gEngineForce(0.f),
+gBreakingForce(0.f),
+maxEngineForce(2000.f),//this should be engine/velocity dependent
+maxBreakingForce(200.f),
+gVehicleSteering(0.f),
+steeringIncrement(0.04f),
+steeringClamp(0.3f),
+wheelRadius(0.5f),
+wheelWidth(0.2f),
+wheelFriction(1000),//BT_LARGE_
+suspensionStiffness(20.f),
+suspensionDamping(2.3f),
+suspensionCompression(4.4f),
+rollInfluence(0.1f),//1.0f;
+suspensionRestLength(0.6)
 {
 	m_vehicle = 0;
 	m_wheelShape = 0;
@@ -141,7 +166,7 @@ void VehiclePhysic::initPhysics()
 	tr.setIdentity();
 	tr.setOrigin(btVector3(0,-3.f,0));
 
-#ifdef USE_TRIMESH_GROUND
+// Create Mesh **********************************************
 	const float TRIANGLE_SIZE=20.f;
 
 	//create a triangle mesh ground
@@ -197,66 +222,7 @@ void VehiclePhysic::initPhysics()
 
 	m_collisionShapes.push_back(groundShape);
 
-#else	//height field terrain shape
-	int width=128;
-	int length=128;
-
-
-#ifdef LOAD_FROM_FILE
-	unsigned char* heightfieldData = new unsigned char[width*length];
-	{
-		for (int i=0;i<width*length;i++)
-		{
-			heightfieldData[i]=0;
-		}
-	}
-
-	char*	filename="heightfield128x128.cpp";
-	FILE* heightfieldFile = fopen(filename,"r");
-	if (!heightfieldFile)
-	{
-		filename="../heightfield/heightfield128x128.raw";
-		heightfieldFile = fopen(filename,"r");
-	}
-	if (heightfieldFile)
-	{
-		int numBytes =fread(heightfieldData,1,width*length,heightfieldFile);
-		//btAssert(numBytes);
-		if (!numBytes)
-		{
-			printf("couldn't read heightfield at %s\n",filename);
-		}
-		fclose (heightfieldFile);
-	}
-#else
-	char* heightfieldData = MyHeightfield;
-#endif
-
-
-	//btScalar maxHeight = 20000.f;//exposes a bug
-	btScalar maxHeight = 100;
-	
-	bool useFloatDatam=false;
-	bool flipQuadEdges=false;
-
-	btHeightfieldTerrainShape* heightFieldShape = new btHeightfieldTerrainShape(width,length,heightfieldData,maxHeight,upIndex,useFloatDatam,flipQuadEdges);;
-	btVector3 mmin,mmax;
-	heightFieldShape->getAabb(btTransform::getIdentity(),mmin,mmax);
-
-	groundShape = heightFieldShape;
-	
-	heightFieldShape->setUseDiamondSubdivision(true);
-
-	btVector3 localScaling(100,1,100);
-	localScaling[upIndex]=1.f;
-	groundShape->setLocalScaling(localScaling);
-
-	//tr.setOrigin(btVector3(0,9940,0));
-	tr.setOrigin(btVector3(0,49.4,0));
-
-	m_collisionShapes.push_back(groundShape);
-
-#endif	// heightfield
+	//********************************************************************
 
 	//CreateTerrain(tr, groundShape);
 	//create ground object
@@ -278,11 +244,8 @@ void VehiclePhysic::initPhysics()
 	tr.setOrigin(btVector3(0,0.f,0));
 
 	m_carChassis = localCreateRigidBody(800,tr,compound);//chassisShape);
-	//m_carChassis->setDamping(0.2,0.2);
 	
 	m_wheelShape = new btCylinderShapeX(btVector3(wheelWidth,wheelRadius,wheelRadius));
-
-	//m_collisionShapes.push_back(m_wheelShape);
 
 	ResetVehicle();
 
@@ -299,7 +262,7 @@ void VehiclePhysic::CreateVehicle()
 
 	m_dynamicsWorld->addVehicle(m_vehicle);
 
-	float connectionHeight = 0.6f;
+	float connectionHeight = 1.2f;
 
 	bool isFrontWheel=true;
 
@@ -390,7 +353,7 @@ void VehiclePhysic::MoveVehicle()
 
 	if (m_dynamicsWorld)
 	{
-		int numSimSteps = m_dynamicsWorld->stepSimulation(1.0f / 60.0f, 10, 1.0f / 60.0f);
+		int numSimSteps = m_dynamicsWorld->stepSimulation(dt, 100);
 
 //#define VERBOSE_FEEDBACK
 #ifdef VERBOSE_FEEDBACK
@@ -574,6 +537,7 @@ btDynamicsWorld* VehiclePhysic::GetDynamicsWorld()
 
 
 
+//USED ONLY FOR DEBUG! DO NOT CHANGE
 
 //to be implemented by the demo
 void VehiclePhysic::renderme()
