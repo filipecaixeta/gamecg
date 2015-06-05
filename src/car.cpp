@@ -1,11 +1,12 @@
 #include <car.h>
 
+
 Car::Car(string path):model(path)
 {
 	for(auto& mesh: model.meshes)
 	{
 		if (mesh.material->name.find("GLASS_INTERIOR")==0)
-			mesh.material->color_transparent=vec4(1.0f,1.0f,1.0f,0.3f);
+			mesh.material->color_transparent=vec4(1.0f,1.0f,1.0f,0.7f);
 		else if (mesh.material->name.find("BreakLight")==0)
 			mesh.material->color_emissive=vec4(1.0f,0.0f,0.0f,1.0f);
 		else if (mesh.material->name.find("LIGHT_BACK")==0)
@@ -23,8 +24,8 @@ Car::Car(string path):model(path)
 			Tire_br.push_back(&mesh);
 		else if (mesh.meshName.find("steeringwheel")==0)
 			steeringwheel=&mesh;
-		
 	}
+
 	vec3 cmin;
 	vec3 cmax;
 	cmin=vec3(INFINITY,INFINITY,INFINITY);

@@ -78,7 +78,7 @@ void renderCar(int carNr)
 
 	cars[key]->updateFrontWheel(carang2);
 	cars[key]->spinWheel(carang);
-	carang+=0.1;
+	carang+=0.5;
 	carang2+=0.01*sentido;
 	if (fabs(carang2)>1.0)
 	{
@@ -153,7 +153,7 @@ void renderScene()
 }
 void displayWin()
 {
-	clear(0.22,0.22,0.22,1.0);
+	clear(0.6,0.8,1.0,1.0);
 	shaders["car"]->reloadShader();
 	shaders["scenario"]->reloadShader();
 	/*if (speedKey==GLUT_KEY_UP)
@@ -299,7 +299,7 @@ void keyBoardUp( int key, int x, int y )
 	}
 	gkey=0;
 }
-void keyBorardFunc(unsigned char key, int, int)
+void keyBoardFunc(unsigned char key, int, int)
 {
 	// std::cout << key << std::endl;
 	switch(key)
@@ -338,7 +338,7 @@ void keyBorardFunc(unsigned char key, int, int)
 	}
 	glutPostRedisplay();
 }
-void keyBorardUpFunc(unsigned char key, int, int)
+void keyBoardUpFunc(unsigned char key, int, int)
 {
 	switch(key)
 	{
@@ -354,10 +354,10 @@ void keyBorardUpFunc(unsigned char key, int, int)
 }
 int main(int argc, char *argv[])
 {
-	std::cerr<<"LOL!";
+	
 #ifndef DEBUG_MODE
 	MainCar = new VehiclePhysic;
-
+	std::cerr<<"DEBUG_MODE!";
 	int wWidth=720;
 	int wHeight=480;
 
@@ -369,10 +369,10 @@ int main(int argc, char *argv[])
  	glutCreateWindow(windowName);
  	
  	glEnable(GL_DEPTH_TEST); 
- 	// glEnable(GL_BLEND);
- 	glAlphaFunc ( GL_GREATER, 0.5 ) ;
  	glEnable ( GL_ALPHA_TEST ) ;
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+ 	glAlphaFunc ( GL_GREATER, 0.5 ) ;
+ 	
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
  	camera = new Camera(vec3(0.0f,5.0f,-10.0f),vec3(0.0,0.0,0.0),wWidth,wHeight);
 
@@ -386,8 +386,8 @@ int main(int argc, char *argv[])
     glutDisplayFunc(displayWin);
 	glutReshapeFunc(reshapeWin);
 	glutIdleFunc(idle);
-	glutKeyboardFunc(keyBorardFunc);
-	glutKeyboardUpFunc(keyBorardUpFunc);
+	glutKeyboardFunc(keyBoardFunc);
+	glutKeyboardUpFunc(keyBoardUpFunc);
 	glutSpecialFunc(processSpecialKeys);
 	glutSpecialUpFunc(keyBoardUp);
     glutMainLoop();
