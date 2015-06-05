@@ -32,7 +32,7 @@ gBreakingForce(0.f),
 maxEngineForce(2000.f),//this should be engine/velocity dependent
 maxBreakingForce(200.f),
 gVehicleSteering(0.f),
-steeringIncrement(0.04f),
+steeringIncrement(0.005f),
 steeringClamp(0.3f),
 wheelRadius(0.5f),
 wheelWidth(0.2f),

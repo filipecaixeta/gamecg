@@ -237,7 +237,8 @@ void init()
 	shaders["scenario"]	= new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
 
 	// Load the scenario mesh
-	scenario = new Scenario(baseDir+"3dModels/city3/city.obj");
+	scenario = new Scenario(baseDir+"3dModels/city7/city.obj");
+
 	std::cerr << "SHADERS" << std::endl;
 
 	// Load one car mesh
