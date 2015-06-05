@@ -59,6 +59,7 @@ VehiclePhysic* MainCar;
 //Sounds
 Music music;
 Chunk changeStation;
+int songNumber = 1;
 
 std::map<std::string,Shader*> shaders;
 std::map<std::string,Car*> cars;
@@ -456,9 +457,13 @@ void idle()
 
 void changeMusic()
 {
+	songNumber++;
+	if(songNumber == 3)
+		songNumber = 1;
 	music.stopSound();
 	changeStation.playSound(ONCE, 1);
-	music.loadFile(baseDir+"sound/music/mus1.wav");
+	std::string tmp = std::to_string(songNumber);
+	music.loadFile(baseDir+"sound/music/mus"+tmp+".wav");
 	music.playSound();
 
 }
