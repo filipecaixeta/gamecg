@@ -18,6 +18,11 @@ class btCollisionShape;
 
 #include "GlutDemoApplication.h"
 
+#define fl 0
+#define fr 1
+#define br 2
+#define bl 3
+
 enum Keys
 {
 	KEY_FORWARD,
