@@ -65,16 +65,13 @@ std::map<std::string,Car*> cars;
 Scenario *scenario;
 float ang=0;
 vector<int> carsList={9};
-mat4 moveCar(1.0f);
 int gkey=0;
 int speedKey=0;
 int directionKey=0;
 int brakeKey = 0;
 int cameraMode=1;
-float carang=0.0;
 float frontWheelAng=0.0;
 float frontWheelAngMax=1.0;
-int sentido=1;
 std::queue<vec3> eyePosQ;
 std::queue<vec3> lookAtPosQ;
 
@@ -92,19 +89,9 @@ void renderCar(int carNr)
 	if (speed>M_PI)
 		speed-=M_PI;
 	cars[key]->spinWheel(speed);
-	carang+=0.5;
-	// frontWheelAng+=0.01*sentido;
-	if (fabs(frontWheelAng)>1.0)
-	{
-		if (sentido==1)
-			sentido=-1;
-		else
-			sentido=1;
-	}
 
 	mat4 Model = cars[key]->modelMatrix;
-	Model = glm::rotate(mat4(1.0f),ang,glm::vec3(0.0,1.0,0.0))*moveCar;
-
+	mat4 ModelCamera = MainCar->GetVehicleMatrix()*glm::rotate(mat4(1.0f),ang,glm::vec3(0.0,1.0,0.0));
 	Model = MainCar->GetVehicleMatrix() * Model;
 	vec4 v;
 	
@@ -133,12 +120,10 @@ void renderCar(int carNr)
 	}
 	if (cameraMode==3)
 	{
-		// ang=1;
-		// v=Model*vec4(4*sin(ang),1.5,3*cos(ang),1.0f);
-		v=Model*vec4(5*sin(ang),4.0,5*cos(ang),1.0f);
+		v=ModelCamera*vec4(5*sin(ang),4.0,5*cos(ang),1.0f);
 		camera->eyePos=vec3(v.x,v.y,v.z);
 
-		v=Model*vec4(0.0f,0.0f,0.0f,1.0f);
+		v=ModelCamera*vec4(0.0f,0.0f,0.0f,1.0f);
 		camera->lookAtPos=vec3(v.x,v.y,v.z);
 	}
 	else
@@ -250,7 +235,7 @@ void init()
 	shaders["scenario"]	= new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
 
 	// Load the scenario mesh
-	scenario = new Scenario(baseDir+"3dModels/city7/city.obj");
+	scenario = new Scenario(baseDir+"3dModels/city3/city.obj");
 
 	// Load one car mesh
 	for (int carNr: carsList)
