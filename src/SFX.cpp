@@ -5,7 +5,7 @@ SFX::SFX(int channel) {
 	SDL_Init( SDL_INIT_AUDIO );
 	type = 0;
 	this->channel = channel;
-	Mix_OpenAudio( this->channel, MIX_DEFAULT_FORMAT, 2, 4096 );
+	Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 8, 4096 );
 }
 
 SFX::SFX() {
@@ -13,7 +13,7 @@ SFX::SFX() {
 	SDL_Init( SDL_INIT_AUDIO );
 	type = 0;
 	this->channel = 44100;
-	Mix_OpenAudio( this->channel, MIX_DEFAULT_FORMAT, 2, 4096 );
+	Mix_OpenAudio( this->channel, MIX_DEFAULT_FORMAT, 8, 4096 );
 }
 
 SFX::~SFX() {

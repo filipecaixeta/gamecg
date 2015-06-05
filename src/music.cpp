@@ -4,12 +4,14 @@ Music::Music()
 {
 	// TODO Auto-generated constructor stub
 	music = NULL;
+	channel = 0;
 }
 
 Music::Music(int channel) : SFX(channel) 
 {
 	// TODO Auto-generated constructor stub
 	music = NULL;
+	channel = 0;
 }
 
 Music::~Music() {

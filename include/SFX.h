@@ -4,10 +4,13 @@
 #include "SDL_mixer.h"
 #include <iostream>
 
+#define LOOPING -1
+#define ONCE 0
+
 using namespace std;
 
 class SFX {
-private:
+protected:
 	int type;
 	int channel;
 public:

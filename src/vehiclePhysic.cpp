@@ -131,8 +131,8 @@ suspensionRestLength(0.6)
 
 	//Start Sounds
 	Chunk *tmp;
-	tmp = new Chunk(22050);
-	tmp->loadFile("../sound/effect/start1.wav");
+	tmp = new Chunk();
+	tmp->loadFile("../sound/effect/acceleratingMain.wav");
 	effect.push_back(tmp);
 }
 
@@ -399,9 +399,9 @@ void VehiclePhysic::KeyDown(int key)
 		gEngineForce = maxEngineForce - m_vehicle->getCurrentSpeedKmHour() * 50.0;
 		if(gEngineForce < 2000.0f)
 			gEngineForce = 2000.0f;
-		if(m_vehicle->getCurrentSpeedKmHour() < 2.0)
+		if(m_vehicle->getCurrentSpeedKmHour() < 10.0 && !(effect[0]->isPlaying()))
 		{
-			effect[0]->playSound();
+			effect[0]->playSound(LOOPING);
 		}
 		gBreakingForce = 0.f;
 	}
@@ -419,6 +419,7 @@ void VehiclePhysic::KeyDown(int key)
 	}
 	if(key == KEY_SPACE)
 	{
+		effect[0]->stopSound();
 		gBreakingForce = maxBreakingForce;
 		gEngineForce = 0.0;
 	}

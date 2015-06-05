@@ -11,7 +11,9 @@ public:
 	Chunk(int);
 	virtual ~Chunk();
 	void loadFile(string);
-	void playSound();
+	void playSound(int looping = ONCE);
+	void stopSound();
+	int isPlaying();
 	void changeVolume(int);
 };
 
