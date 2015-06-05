@@ -8,9 +8,13 @@ class btCollisionShape;
 #include "BulletDynamics/Vehicle/btRaycastVehicle.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 
+#include <vector>
+
 #include <glm/glm.hpp>
 #include <scenario.h>
 #include <car.h>
+#include <music.h>
+#include <chunk.h>
 
 #include "GlutDemoApplication.h"
 
@@ -97,6 +101,9 @@ private:
 
 	CarPos carPos;
 	btScalar carPosRot[16];
+
+	Music accelerationSound;
+
 
 	btScalar suspensionRestLength;
 

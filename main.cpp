@@ -50,13 +50,15 @@ void keyBorardFunc(unsigned char,int,int);
 void idle();
 void init();
 void loadCar(int carNr);
+void changeMusic();
 // GLOBAL VARIABLES
 Light light(vec3(0.0f,2.0f,10.0f));
 Camera *camera;
 
 VehiclePhysic* MainCar;
 //Sounds
-std::vector<SFX*> sounds;
+Music music;
+Chunk changeStation;
 
 std::map<std::string,Shader*> shaders;
 std::map<std::string,Car*> cars;
@@ -222,6 +224,7 @@ void displayWin()
     ang+=0.003;
 	glutSwapBuffers();
 }
+
 void init()
 {
 	// Shader for all the cars
@@ -243,13 +246,9 @@ void init()
 
 	MainCar = new VehiclePhysic(scenario,cars[key]);
 
-	SFX *tmp;
-	tmp = new Chunk();
-	tmp->loadFile(baseDir+"sound/effect/break2.wav"); //start the car
-	sounds.push_back(tmp);
-	tmp = new Chunk();
-	tmp->loadFile(baseDir+"sound/effect/start.wav");
-	sounds.push_back(tmp);
+	music.loadFile(baseDir+"sound/music/mus1.wav");
+	music.playSound();
+	changeStation.loadFile(baseDir+"sound/music/change.wav");
 }
 
 
@@ -259,7 +258,6 @@ void processSpecialKeys(int key, int , int )
 	switch( key ) 
 	{
 		case GLUT_KEY_UP:
-			sounds[1]->playSound();
 		case GLUT_KEY_DOWN:
 			speedKey=key;
 			break;
@@ -309,7 +307,6 @@ void keyBoardFunc(unsigned char key, int, int)
 			break;
 		case 'a':
 			directionKey=GLUT_KEY_LEFT;
-			sounds[1]->playSound();
 			break;
 		case 'p':
 			directionKey=GLUT_KEY_LEFT;
@@ -318,8 +315,10 @@ void keyBoardFunc(unsigned char key, int, int)
 			MainCar->ResetVehicle();
 			break;
 		case ' ':
-			sounds[0]->playSound();
 			brakeKey = 1;
+			break;
+		case 'm':
+			changeMusic();
 			break;
 	}
 	if (key=='p')
@@ -427,4 +426,13 @@ void reshapeWin(int wWidth, int wHeight)
 void idle()
 {
 	glutPostRedisplay();
+}
+
+void changeMusic()
+{
+	music.stopSound();
+	changeStation.playSound();
+	music.loadFile(baseDir+"sound/music/mus1.wav");
+	music.playSound();
+
 }

@@ -8,9 +8,11 @@ private:
 	Mix_Chunk* chunk;
 public:
 	Chunk();
+	Chunk(int);
 	virtual ~Chunk();
 	void loadFile(string);
 	void playSound();
+	void changeVolume(int);
 };
 
 #endif /* CHUNK_H_ */

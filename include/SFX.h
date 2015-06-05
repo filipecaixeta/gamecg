@@ -9,8 +9,11 @@ using namespace std;
 class SFX {
 private:
 	int type;
+	int channel;
 public:
 	SFX();
+	SFX(int);
+	void changeVolume(int);
 	virtual ~SFX();
 	virtual void loadFile(string);
 	virtual void playSound();

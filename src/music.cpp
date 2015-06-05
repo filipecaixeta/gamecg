@@ -1,6 +1,13 @@
 #include "music.h"
 
-Music::Music() {
+Music::Music()
+{
+	// TODO Auto-generated constructor stub
+	music = NULL;
+}
+
+Music::Music(int channel) : SFX(channel) 
+{
 	// TODO Auto-generated constructor stub
 	music = NULL;
 }
@@ -35,4 +42,9 @@ int Music::isPlaying() {
 
 int Music::isPaused() {
 	return Mix_PausedMusic();
+}
+
+void Music::changeVolume(int volume)
+{
+	SFX::changeVolume(volume);
 }
