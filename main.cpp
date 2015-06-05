@@ -23,7 +23,7 @@
 
 
 //TEST*************************************
-//#define DEBUG_MODE
+#define DEBUG_MODE
 #ifdef DEBUG_MODE
 #include "GlutStuff.h"
 #include "GLDebugDrawer.h"
@@ -157,24 +157,6 @@ void displayWin()
 	clear(0.6,0.8,1.0,1.0);
 	shaders["car"]->reloadShader();
 	shaders["scenario"]->reloadShader();
-	/*if (speedKey==GLUT_KEY_UP)
-	{
-		moveCar = glm::translate(moveCar,vec3(0.0,0.0,0.2));
-
-		if (directionKey==GLUT_KEY_LEFT)
-			moveCar = glm::rotate(moveCar,3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
-		else if (directionKey==GLUT_KEY_RIGHT)
-			moveCar = glm::rotate(moveCar,-3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
-	}
-	else if (speedKey==GLUT_KEY_DOWN)
-	{
-		moveCar = glm::translate(moveCar,vec3(0.0,0.0,-0.2));
-		
-		if (directionKey==GLUT_KEY_RIGHT)
-			moveCar = glm::rotate(moveCar,3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
-		else if (directionKey==GLUT_KEY_LEFT)
-			moveCar = glm::rotate(moveCar,-3.1415f/200.0f,glm::vec3(0.0,1.0,0.0));
-	}*/
 
 	if (speedKey==GLUT_KEY_UP)
 	{
@@ -192,9 +174,9 @@ void displayWin()
 		MainCar->KeyDown(KEY_BACK);
 		
 		if (directionKey==GLUT_KEY_RIGHT)
-			MainCar->KeyDown(KEY_LEFT);
-		else if (directionKey==GLUT_KEY_LEFT)
 			MainCar->KeyDown(KEY_RIGHT);
+		else if (directionKey==GLUT_KEY_LEFT)
+			MainCar->KeyDown(KEY_LEFT);
 		else if (directionKey == 0)
 			MainCar->KeyUp(KEY_LEFT);
 	}
@@ -260,16 +242,6 @@ void init()
 	}
 
 	MainCar = new VehiclePhysic(scenario);
-
-	/*int indSize = meshP->indices.size();
-	int triangleSize = indSize / 3;
-	GLuint* firstInd = &(meshP->indices[0]);
-	int indexStride = 3 * sizeof(GLuint);
-	int totalVert = meshP->vertices.size();
-	float* firstVert = &(meshP->vertices[0].Position.x);
-	int vertStride = sizeof(Vertex);
-	MainCar = new VehiclePhysic(triangleSize, (int*)firstInd, indexStride, totalVert, firstVert, vertStride);
-*/
 }
 void processSpecialKeys(int key, int , int ) 
 {
@@ -367,8 +339,7 @@ int main(int argc, char *argv[])
 {
 	
 #ifndef DEBUG_MODE
-	// MainCar = new VehiclePhysic;
-	// std::cerr<<"DEBUG_MODE!";
+
 	int wWidth=720;
 	int wHeight=480;
 
@@ -403,6 +374,8 @@ int main(int argc, char *argv[])
 	glutSpecialUpFunc(keyBoardUp);
     glutMainLoop();
     return 0;
+
+
 #else
     std::cerr << "LOL";
     int wWidth=720;

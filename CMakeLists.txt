@@ -60,6 +60,13 @@ else()
 endif()
 
 #########################################################
+# FIND SDL 2
+#########################################################
+FIND_LIBRARY(SDL2_LIBRARY SDL2 /usr/local/lib/libSDL2.so)
+FIND_LIBRARY(SDL2_MIXER SDL2_mixer /usr/local/lib/libSDL2_mixer.so)
+
+
+#########################################################
 # INCLUDE DIRECTORIES
 #########################################################
 include_directories(
@@ -67,6 +74,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include
 ${ASSIMP_INCLUDE_DIRS}
 ${BULLET_PHYSICS_SOURCE_DIR}/src 
 /usr/local/include/bullet
+/usr/local/include/SDL2
 )
 
 #########################################################
@@ -121,6 +129,8 @@ set(ALL_LIBS
 	${OPENGL_SUP}
 	${ASSIMP_LIBRARY}
 	${ASSIMP2}
+	${SDL2_LIBRARY}
+	${SDL2_MIXER}
 )
 
 target_link_libraries(${PROJECT_NAME} ${ALL_LIBS} assimp)
