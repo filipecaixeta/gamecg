@@ -19,7 +19,11 @@
 #include <light.h>
 #include <camera.h>
 #include <queue>
+
 #include <vehiclePhysic.h>
+#include <SFX.h>
+#include <music.h>
+#include <chunk.h>
 
 
 //TEST*************************************
@@ -51,6 +55,8 @@ Light light(vec3(0.0f,2.0f,10.0f));
 Camera *camera;
 
 VehiclePhysic* MainCar;
+//Sounds
+std::vector<SFX*> sounds;
 
 std::map<std::string,Shader*> shaders;
 std::map<std::string,Car*> cars;
@@ -161,7 +167,6 @@ void displayWin()
 	if (speedKey==GLUT_KEY_UP)
 	{
 		MainCar->KeyDown(KEY_FORWARD);
-
 		if (directionKey==GLUT_KEY_LEFT)
 			MainCar->KeyDown(KEY_LEFT);
 		else if (directionKey==GLUT_KEY_RIGHT)
@@ -244,6 +249,14 @@ void init()
 	sprintf(key,"car%d",carsList[0]);
 
 	MainCar = new VehiclePhysic(scenario,cars[key]);
+
+	SFX *tmp;
+	tmp = new Chunk();
+	tmp->loadFile(baseDir+"sound/effect/break2.wav"); //start the car
+	sounds.push_back(tmp);
+	tmp = new Chunk();
+	tmp->loadFile(baseDir+"sound/effect/start.wav");
+	sounds.push_back(tmp);
 }
 
 
@@ -253,6 +266,7 @@ void processSpecialKeys(int key, int , int )
 	switch( key ) 
 	{
 		case GLUT_KEY_UP:
+			sounds[1]->playSound();
 		case GLUT_KEY_DOWN:
 			speedKey=key;
 			break;
@@ -302,6 +316,7 @@ void keyBoardFunc(unsigned char key, int, int)
 			break;
 		case 'a':
 			directionKey=GLUT_KEY_LEFT;
+			sounds[1]->playSound();
 			break;
 		case 'p':
 			directionKey=GLUT_KEY_LEFT;
@@ -310,6 +325,7 @@ void keyBoardFunc(unsigned char key, int, int)
 			MainCar->ResetVehicle();
 			break;
 		case ' ':
+			sounds[0]->playSound();
 			brakeKey = 1;
 			break;
 	}

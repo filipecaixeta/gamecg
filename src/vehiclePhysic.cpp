@@ -29,10 +29,12 @@ m_minCameraDistance(3.f),
 m_maxCameraDistance(10.f),
 gEngineForce(0.f),
 gBreakingForce(0.f),
-maxEngineForce(2000.f),//this should be engine/velocity dependent
+maxEngineForce(10000.f),//this should be engine/velocity dependent
 maxBreakingForce(200.f),
 gVehicleSteering(0.f),
-steeringIncrement(0.005f),
+steeringIncrement(0.04f),
+steeringIncrementMin(0.001f),
+steeringIncrementMax(0.03f),
 steeringClamp(0.3f),
 wheelRadius(0.5f),
 wheelWidth(0.2f),
@@ -301,6 +303,8 @@ void VehiclePhysic::MoveVehicle()
 		m_vehicle->setSteeringValue(gVehicleSteering,wheelIndex);
 	}
 
+	std::cout << "KmHour: " << m_vehicle->getCurrentSpeedKmHour() << std::endl;
+
 	float dt = 0.0166666f;	//60FPS
 
 	if (m_dynamicsWorld)
@@ -313,8 +317,8 @@ void VehiclePhysic::MoveVehicle()
 	m_carChassis->getMotionState()->getWorldTransform(transChasis);//this gives the right position.  :D 
 	transChasis.getOpenGLMatrix(m);
 
-	std::cout << "x: " << transChasis.getOrigin().getX() << " y: " << transChasis.getOrigin().getY() << " z: " << transChasis.getOrigin().getZ() << std::endl;
-	std::cout << "eng: " << gEngineForce << " brake: " << gBreakingForce << std::endl;
+	//std::cout << "x: " << transChasis.getOrigin().getX() << " y: " << transChasis.getOrigin().getY() << " z: " << transChasis.getOrigin().getZ() << std::endl;
+	//std::cout << "eng: " << gEngineForce << " brake: " << gBreakingForce << std::endl;
 
 
 	carPos.chassisPos = glm::vec3(
@@ -333,7 +337,7 @@ void VehiclePhysic::MoveVehicle()
 	AngleY = atan2f(m[8], m[10]);  // Y-axis!!!
 	AngleZ = asinf(m[9]);
 
-	std::cout << "Rx: " << AngleX << " Ry: " << AngleY << " Rz: " << AngleZ << std::endl;
+	//std::cout << "Rx: " << AngleX << " Ry: " << AngleY << " Rz: " << AngleZ << std::endl;
 
 	carPos.chassisRot = glm::vec3(AngleX, AngleY, AngleZ);
 
@@ -356,28 +360,39 @@ void VehiclePhysic::MoveVehicle()
 		AngleY = atan2f(m[8], m[10]);  // Y-axis!!!
 		AngleZ = asinf(m[9]);
 
-		std::cout << "Wx: " << AngleX << " Wy: " << AngleY << " Wz: " << AngleZ << std::endl;
+		//std::cout << "Wx: " << AngleX << " Wy: " << AngleY << " Wz: " << AngleZ << std::endl;
 		carPos.wheels[i].rot = glm::vec3(AngleX, AngleY, AngleZ);
 	}
 }
 
 void VehiclePhysic::KeyDown(int key)
 {
+	int fat = 2;
 	if(key == KEY_LEFT) 
 	{
+		if(m_vehicle->getCurrentSpeedKmHour() > 0)
+			steeringIncrement = pow((m_vehicle->getCurrentSpeedKmHour() * (steeringIncrementMin - steeringIncrementMax) + 200.0 * steeringIncrementMax) / 200.0, fat) * steeringIncrementMax / (pow(steeringIncrementMax,fat) - pow(steeringIncrementMin,fat));
+		if (steeringIncrement < steeringIncrementMin)
+			steeringIncrement = steeringIncrementMin;
 		gVehicleSteering += steeringIncrement;
 		if (gVehicleSteering > steeringClamp)
 				gVehicleSteering = steeringClamp;
 	}
     if(key == KEY_RIGHT) 
 	{
+		if(m_vehicle->getCurrentSpeedKmHour() > 0)
+			steeringIncrement = pow((m_vehicle->getCurrentSpeedKmHour() * (steeringIncrementMin - steeringIncrementMax) + 200.0 * steeringIncrementMax) / 200.0, fat) * steeringIncrementMax / (pow(steeringIncrementMax,fat) - pow(steeringIncrementMin,fat));
+		if (steeringIncrement < steeringIncrementMin)
+			steeringIncrement = steeringIncrementMin;
 		gVehicleSteering -= steeringIncrement;
 		if (gVehicleSteering < -steeringClamp)
 				gVehicleSteering = -steeringClamp;
 	}
     if(key == KEY_FORWARD)
 	{
-		gEngineForce = maxEngineForce;
+		gEngineForce = maxEngineForce - m_vehicle->getCurrentSpeedKmHour() * 50.0;
+		if(gEngineForce < 2000.0f)
+			gEngineForce = 2000.0f;
 		gBreakingForce = 0.f;
 	}
 	if(key == KEY_BACK)
@@ -385,7 +400,7 @@ void VehiclePhysic::KeyDown(int key)
 		gEngineForce = -maxEngineForce;
 		if(m_vehicle->getCurrentSpeedKmHour() > 0)
 		{
-			gBreakingForce = 100.0f;
+			gBreakingForce = maxBreakingForce;
 		}
 		else
 		{
@@ -396,6 +411,7 @@ void VehiclePhysic::KeyDown(int key)
 	{
 		gBreakingForce = maxBreakingForce;
 		gEngineForce = 0.0;
+		gVehicleSteering = 0.0;
 	}
 }
 
@@ -587,6 +603,8 @@ maxEngineForce(2000.f),//this should be engine/velocity dependent
 maxBreakingForce(200.f),
 gVehicleSteering(0.f),
 steeringIncrement(0.04f),
+steeringIncrementMin(0.0005f),
+steeringIncrementMax(0.04f),
 steeringClamp(0.3f),
 wheelRadius(0.5f),
 wheelWidth(0.2f),
