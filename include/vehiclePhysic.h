@@ -84,6 +84,8 @@ private:
 
 	float	gVehicleSteering;
 	float	steeringIncrement;
+	float	steeringIncrementMin;
+	float	steeringIncrementMax;
 	float	steeringClamp;
 	float	wheelRadius;
 	float	wheelWidth;
