@@ -246,7 +246,7 @@ void init()
 
 	MainCar = new VehiclePhysic(scenario,cars[key]);
 
-	music.loadFile(baseDir+"sound/effect/mus1.wav");
+	music.loadFile(baseDir+"sound/music/mus1.wav");
 	music.playSound();
 	music.pauseSound();
 	changeStation.loadFile(baseDir+"sound/music/change.wav");

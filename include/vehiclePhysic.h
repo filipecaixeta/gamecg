@@ -67,6 +67,8 @@ public:
 	btRaycastVehicle*	m_vehicle;
 	btCollisionShape*	m_wheelShape;
 
+	CarPos carPos;
+
 	VehiclePhysic();
 	VehiclePhysic(Scenario *scene,Car *car);
 	virtual ~VehiclePhysic();
@@ -77,6 +79,7 @@ public:
 	void ResetVehicle();
 	void CreateTerrain(btTransform tr, btCollisionShape* groundShape);
 	glm::mat4 GetVehicleMatrix();
+
 	btDynamicsWorld* GetDynamicsWorld();
 
 private:
@@ -99,10 +102,9 @@ private:
 	float	suspensionCompression;
 	float	rollInfluence;//1.0f;
 
-	CarPos carPos;
 	btScalar carPosRot[16];
-	
-	std::vector<Chunk*> effects;
+
+	std::vector<Chunk*> effect;
 
 	btScalar suspensionRestLength;
 
