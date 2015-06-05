@@ -33,9 +33,9 @@ maxEngineForce(10000.f),//this should be engine/velocity dependent
 maxBreakingForce(200.f),
 gVehicleSteering(0.f),
 steeringIncrement(0.04f),
-steeringIncrementMin(0.001f),
-steeringIncrementMax(0.03f),
-steeringClamp(0.3f),
+steeringIncrementMin(0.0008f),
+steeringIncrementMax(0.04f),
+steeringClamp(0.35f),
 wheelRadius(0.5f),
 wheelWidth(0.2f),
 wheelFriction(1000),//BT_LARGE_
@@ -367,7 +367,7 @@ void VehiclePhysic::MoveVehicle()
 
 void VehiclePhysic::KeyDown(int key)
 {
-	int fat = 2;
+	int fat = 3;
 	if(key == KEY_LEFT) 
 	{
 		if(m_vehicle->getCurrentSpeedKmHour() > 0)
@@ -419,7 +419,7 @@ void VehiclePhysic::KeyUp(int key)
 {
 	if(key == KEY_LEFT || key == KEY_RIGHT) 
 	{
-		gVehicleSteering = 0.0;
+		gVehicleSteering *= 0.2;
 	}
     if(key == KEY_FORWARD || key == KEY_BACK)
 	{

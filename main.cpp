@@ -167,34 +167,27 @@ void displayWin()
 	if (speedKey==GLUT_KEY_UP)
 	{
 		MainCar->KeyDown(KEY_FORWARD);
-		if (directionKey==GLUT_KEY_LEFT)
-			MainCar->KeyDown(KEY_LEFT);
-		else if (directionKey==GLUT_KEY_RIGHT)
-			MainCar->KeyDown(KEY_RIGHT);
-		else if (directionKey == 0)
-			MainCar->KeyUp(KEY_LEFT);
 	}
 	else if (speedKey==GLUT_KEY_DOWN)
 	{
-		MainCar->KeyDown(KEY_BACK);
-		
-		if (directionKey==GLUT_KEY_RIGHT)
-			MainCar->KeyDown(KEY_RIGHT);
-		else if (directionKey==GLUT_KEY_LEFT)
-			MainCar->KeyDown(KEY_LEFT);
-		else if (directionKey == 0)
-			MainCar->KeyUp(KEY_LEFT);
+		MainCar->KeyDown(KEY_BACK);	
 	}
 	else if (speedKey == 0)
 	{
 		MainCar->KeyUp(KEY_FORWARD);
+	}
 
-		if (directionKey==GLUT_KEY_RIGHT)
-			MainCar->KeyDown(KEY_LEFT);
-		else if (directionKey==GLUT_KEY_LEFT)
-			MainCar->KeyDown(KEY_RIGHT);
-		else if (directionKey == 0)
-			MainCar->KeyUp(KEY_LEFT);
+	if (directionKey==GLUT_KEY_RIGHT)
+	{
+		MainCar->KeyDown(KEY_RIGHT);
+	}
+	else if (directionKey==GLUT_KEY_LEFT)
+	{
+		MainCar->KeyDown(KEY_LEFT);
+	}
+	else if (directionKey == 0)
+	{
+		MainCar->KeyUp(KEY_LEFT);
 	}
 
 	if(brakeKey)
