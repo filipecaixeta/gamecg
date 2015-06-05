@@ -6,7 +6,7 @@ Camera::Camera(vec3 eyePos,vec3 lookAtPos,int w,int h):
 	up(0.0f,1.0f,0.0f)
 {
 	near=0.1f;
-	far=300.0f;
+	far=1000.0f;
 	setAspect(w,h);
 }
 Camera::~Camera()
