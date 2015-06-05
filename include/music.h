@@ -8,6 +8,7 @@ private:
 	Mix_Music* music;
 public:
 	Music();
+	Music(int);
 	virtual ~Music();
 	void loadFile(string);
 	void playSound();
@@ -15,6 +16,7 @@ public:
 	void stopSound();
 	int isPlaying();
 	int isPaused();
+	void changeVolume(int);
 };
 
 #endif /* MUSIC_H_ */
