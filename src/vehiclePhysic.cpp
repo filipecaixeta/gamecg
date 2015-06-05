@@ -21,7 +21,7 @@ const int maxOverlap = 65535;
 
 #define CUBE_HALF_EXTENT 1
 
-VehiclePhysic::VehiclePhysic(Scenario *scenario): 
+VehiclePhysic::VehiclePhysic(Scenario *scenario,Car *car): 
 m_carChassis(0),
 m_vertices(0),
 m_cameraHeight(4.f),
@@ -44,44 +44,10 @@ rollInfluence(0.1f),//1.0f;
 suspensionRestLength(0.6)
 {
 
-	int totalVerts = 0;
-	int totalTriangles = 0;
-	
-	Mesh* meshP;
-	for (Mesh &m: scenario->model.meshes)
-	{
-		totalVerts += m.vertices.size();
-		totalTriangles += m.indices.size()/3;
-	}
-
-	vector<vec3> vertices;
-	vector<int> indices;
-	int vertStride = sizeof(vec3);
-	int indexStride = 3*sizeof(int);
-
-	vertices.resize(totalVerts);
-	indices.resize(totalTriangles*3);
-
-	vector<vec3>::iterator v=vertices.begin();
-	vector<int>::iterator i=indices.begin();
-	int indexPos=0;
-
-	for (Mesh &m: scenario->model.meshes)
-	{
-		for (auto &vert: m.vertices)
-		{
-			*v++=vert.Position;
-			indexPos++;
-		}
-		for (int ind: m.indices)
-		{
-			*i++=ind+indexPos;
-		}
-	}
-	std::cerr << "vertices.size()=" << vertices.size() << std::endl;
-	std::cerr << "indices.size()=" << indices.size()/3 << std::endl;
-	int* gIndices = &(indices[0]);
-	btScalar *verticesBeg = (btScalar*)&(vertices[0].x);
+	vec3 wMin=scenario->model.cmin;
+	vec3 wMax=scenario->model.cmax;
+	btVector3 worldMin(wMin.x,wMin.y,wMin.z);
+	btVector3 worldMax(wMax.x,wMax.y,wMax.z);
 
 	m_vehicle = 0;
 	m_wheelShape = 0;
@@ -90,37 +56,49 @@ suspensionRestLength(0.6)
 	m_collisionConfiguration = new btDefaultCollisionConfiguration();
 	m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
 
-	vec3 wMin=scenario->model.cmin;
-	vec3 wMax=scenario->model.cmax;
-	btVector3 worldMin(wMin.x,wMin.y,wMin.z);
-	btVector3 worldMax(wMax.x,wMax.y,wMax.z);
 
 	m_overlappingPairCache = new btAxisSweep3(worldMin,worldMax);
 	m_constraintSolver = new btSequentialImpulseConstraintSolver();
 	m_dynamicsWorld = new btDiscreteDynamicsWorld(m_dispatcher,m_overlappingPairCache,m_constraintSolver,m_collisionConfiguration);
 	
-	//create a triangle mesh ground
+	btTransform tr;
 
-	m_indexVertexArrays = new btTriangleIndexVertexArray(totalTriangles,
+	for (Mesh &m: scenario->model.meshes)
+	{
+		Mesh* meshP;
+		meshP=&m;
+
+		int totalVerts = meshP->vertices.size();
+		int totalTriangles = meshP->indices.size()/3;
+
+		int vertStride = sizeof(Vertex);
+		int indexStride = 3*sizeof(int);
+
+		int* gIndices = (int*)&(meshP->indices[0]);
+		btScalar *verticesBeg = (btScalar*)&(meshP->vertices[0].Position.x);
+
+		m_indexVertexArrays = new btTriangleIndexVertexArray(totalTriangles,
 		gIndices,
 		indexStride,
 		totalVerts,
 		verticesBeg,
 		vertStride);
 
-	bool useQuantizedAabbCompression = true;
-	btCollisionShape* groundShape = new btBvhTriangleMeshShape(m_indexVertexArrays,useQuantizedAabbCompression);
-	
-	btTransform tr;
-	tr.setIdentity();
-	tr.setOrigin(btVector3(0,0.f,0));
+		bool useQuantizedAabbCompression = true;
+		btCollisionShape* groundShape = new btBvhTriangleMeshShape(m_indexVertexArrays,useQuantizedAabbCompression);
+		
+		tr.setIdentity();
+		tr.setOrigin(btVector3(0,0.f,0));
 
-	m_collisionShapes.push_back(groundShape);
-	
-	localCreateRigidBody(0, tr, groundShape);
-	tr.setOrigin(btVector3(0,0,0));
+		m_collisionShapes.push_back(groundShape);
+		
+		localCreateRigidBody(0, tr, groundShape);
+		tr.setOrigin(btVector3(0,0,0));
+	}
 
-	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.f,0.5f,2.f));
+	vec3 sizeCar=vec3(car->model.cmax-car->model.cmin)/2.0f;
+	std::cout << sizeCar.x << " " << sizeCar.y << " " << sizeCar.z << std::endl;
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(sizeCar.x,sizeCar.y,sizeCar.z));
 	m_collisionShapes.push_back(chassisShape);
 
 	btCompoundShape* compound = new btCompoundShape();
@@ -140,7 +118,7 @@ suspensionRestLength(0.6)
 
 	ResetVehicle();
 
-	CreateVehicle();
+	CreateVehicle(car);
 
 	for (int i = 0; i < 16; ++i)
 	{
@@ -241,10 +219,57 @@ void VehiclePhysic::CreateVehicle()
     }
 }
 
+void VehiclePhysic::CreateVehicle(Car *car)
+{
+	m_vehicleRayCaster = new btDefaultVehicleRaycaster(m_dynamicsWorld);
+	m_vehicle = new btRaycastVehicle(m_tuning,m_carChassis,m_vehicleRayCaster);
+	
+	///never deactivate the vehicle
+	m_carChassis->setActivationState(DISABLE_DEACTIVATION);
+
+	m_dynamicsWorld->addVehicle(m_vehicle);
+
+	float connectionHeight = 1.2f;
+
+	bool isFrontWheel=true;
+
+	//choose coordinate system
+	m_vehicle->setCoordinateSystem(rightIndex,upIndex,forwardIndex);
+
+	// add wheels
+    // front left
+    btVector3 connectionPointCS0(car->Tire_fl_center.x,car->Tire_fl_center.y,car->Tire_fl_center.z);
+    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+    // front right
+    connectionPointCS0 = btVector3(car->Tire_fr_center.x,car->Tire_fr_center.y,car->Tire_fr_center.z);
+    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+    isFrontWheel = false;
+    // rear right
+    connectionPointCS0 = btVector3(car->Tire_br_center.x,car->Tire_br_center.y,car->Tire_br_center.z);
+    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+    // rear left
+    connectionPointCS0 = btVector3(car->Tire_bl_center.x,car->Tire_bl_center.y,car->Tire_bl_center.z);
+    m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+	
+	for (int i = 0; i < m_vehicle->getNumWheels(); i++)
+    {
+        btWheelInfo& wheel = m_vehicle->getWheelInfo(i);
+        wheel.m_suspensionStiffness = suspensionStiffness;
+        wheel.m_wheelsDampingRelaxation = suspensionDamping;
+        wheel.m_wheelsDampingCompression = suspensionCompression;
+        wheel.m_frictionSlip = wheelFriction;
+        wheel.m_rollInfluence = rollInfluence;
+    }
+}
+
+
 void VehiclePhysic::ResetVehicle()
 {
 	gVehicleSteering = 0.f;
-	m_carChassis->setCenterOfMassTransform(btTransform::getIdentity());
+	btTransform cm;
+	cm.setIdentity();
+	// cm.setOrigin(btVector3(5.0f,00.0f,5.0f));
+	m_carChassis->setCenterOfMassTransform(cm);
 	m_carChassis->setLinearVelocity(btVector3(0,0,0));
 	m_carChassis->setAngularVelocity(btVector3(0,0,0));
 	m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(m_carChassis->getBroadphaseHandle(),GetDynamicsWorld()->getDispatcher());
@@ -358,11 +383,11 @@ void VehiclePhysic::KeyDown(int key)
 	if(key == KEY_BACK)
 	{			
 		gEngineForce = -maxEngineForce;
-		if(m_vehicle.getCurrentSpeedKmHour() > 0)
+		if(m_vehicle->getCurrentSpeedKmHour() > 0)
 		{
 			gBreakingForce = 100.0f;
 		}
-		else()
+		else
 		{
 			gBreakingForce = 0.0f;
 		}
@@ -527,7 +552,7 @@ void VehiclePhysic::initPhysics()
 	localCreateRigidBody(0, tr, groundShape);
 	tr.setOrigin(btVector3(0,0,0));
 
-	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.f,0.5f,2.f));
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.45256f,0.92366f,3.44712f));
 	m_collisionShapes.push_back(chassisShape);
 
 	btCompoundShape* compound = new btCompoundShape();
@@ -570,7 +595,7 @@ suspensionStiffness(20.f),
 suspensionDamping(2.3f),
 suspensionCompression(4.4f),
 rollInfluence(0.1f),//1.0f;
-suspensionRestLength(0.6)
+suspensionRestLength(1.0)
 {
 	m_vehicle = 0;
 	m_wheelShape = 0;

@@ -23,7 +23,7 @@
 
 
 //TEST*************************************
-#define DEBUG_MODE
+// #define DEBUG_MODE
 #ifdef DEBUG_MODE
 #include "GlutStuff.h"
 #include "GLDebugDrawer.h"
@@ -145,7 +145,7 @@ void renderScene()
 	GLuint program=shaders["scenario"]->getProgram();
 
 	mat4 Model = scenario->modelMatrix;
-	Model = glm::rotate(Model,ang,glm::vec3(0.0,1.0,0.0));
+	// Model = glm::rotate(Model,ang,glm::vec3(0.0,1.0,0.0));
 
 	light.loadToShader(program);
 	camera->loadToShader(program,Model);
@@ -232,7 +232,7 @@ void init()
 	shaders["scenario"]	= new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
 
 	// Load the scenario mesh
-	scenario = new Scenario(baseDir+"3dModels/city3/city.obj");
+	scenario = new Scenario(baseDir+"3dModels/city5/city.obj");
 	std::cerr << "SHADERS" << std::endl;
 
 	// Load one car mesh
@@ -241,7 +241,10 @@ void init()
 		loadCar(carNr);
 	}
 
-	MainCar = new VehiclePhysic(scenario);
+	char key[50];
+	sprintf(key,"car%d",carsList[0]);
+
+	MainCar = new VehiclePhysic(scenario,cars[key]);
 }
 void processSpecialKeys(int key, int , int ) 
 {
