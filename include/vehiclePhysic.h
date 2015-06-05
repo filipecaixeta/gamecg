@@ -10,6 +10,7 @@ class btCollisionShape;
 
 #include <glm/glm.hpp>
 #include <scenario.h>
+#include <car.h>
 
 #include "GlutDemoApplication.h"
 
@@ -63,7 +64,7 @@ public:
 	btCollisionShape*	m_wheelShape;
 
 	VehiclePhysic();
-	VehiclePhysic(Scenario *scene);
+	VehiclePhysic(Scenario *scene,Car *car);
 	virtual ~VehiclePhysic();
 	void initPhysics();
 	void KeyDown(int key);
@@ -97,6 +98,7 @@ private:
 
 	btScalar suspensionRestLength;
 
+	void CreateVehicle(Car *car);
 	void CreateVehicle();
 	btRigidBody*	localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape);
 
