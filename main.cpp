@@ -115,7 +115,7 @@ void renderCar(int carNr)
 	}
 	if (cameraMode==2)
 	{
-		v=Model*vec4(0.0f,3.0,-10.0f,1.0f);
+		v=Model*vec4(0.0f,3.0,-5.0f,1.0f);
 		eyePosQ.push(vec3(v.x,v.y,v.z));
 		camera->eyePos=eyePosQ.front();
 		if (eyePosQ.size()>=15)
