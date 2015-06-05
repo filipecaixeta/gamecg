@@ -101,9 +101,8 @@ private:
 
 	CarPos carPos;
 	btScalar carPosRot[16];
-
-	Music accelerationSound;
-
+	
+	std::vector<Chunk*> effects;
 
 	btScalar suspensionRestLength;
 
