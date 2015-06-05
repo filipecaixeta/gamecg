@@ -104,6 +104,7 @@ void renderCar(int carNr)
 		camera->eyePos=vec3(v.x,v.y,v.z);
 		v=Model*vec4(0.0f,1.0f,6.0f,1.0f);
 		camera->lookAtPos=vec3(v.x,v.y,v.z);
+		music.changeVolume(110);
 	}
 	if (cameraMode==2)
 	{
@@ -117,6 +118,7 @@ void renderCar(int carNr)
 		camera->lookAtPos=lookAtPosQ.front();
 		if (lookAtPosQ.size()>=15)
 			lookAtPosQ.pop();
+		music.changeVolume(40);
 	}
 	if (cameraMode==3)
 	{
@@ -125,6 +127,7 @@ void renderCar(int carNr)
 
 		v=ModelCamera*vec4(0.0f,0.0f,0.0f,1.0f);
 		camera->lookAtPos=vec3(v.x,v.y,v.z);
+		music.changeVolume(40);
 	}
 	else
 		ang=0;
@@ -250,8 +253,10 @@ void init()
 
 	music.loadFile(baseDir+"sound/music/mus1.wav");
 	music.playSound();
+	music.changeVolume(40);
 	music.pauseSound();
 	changeStation.loadFile(baseDir+"sound/music/change.wav");
+	changeStation.changeVolume(1, 127);
 }
 
 
@@ -437,7 +442,7 @@ void idle()
 void changeMusic()
 {
 	music.stopSound();
-	changeStation.playSound();
+	changeStation.playSound(ONCE, 1);
 	music.loadFile(baseDir+"sound/music/mus1.wav");
 	music.playSound();
 

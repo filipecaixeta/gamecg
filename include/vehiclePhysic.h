@@ -9,6 +9,7 @@ class btCollisionShape;
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
 
 #include <vector>
+#include <queue>
 
 #include <glm/glm.hpp>
 #include <scenario.h>
@@ -110,6 +111,7 @@ private:
 	btScalar carPosRot[16];
 
 	std::vector<Chunk*> effect;
+	std::queue<float> accel;
 
 	btScalar suspensionRestLength;
 

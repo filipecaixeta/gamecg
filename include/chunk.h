@@ -8,13 +8,12 @@ private:
 	Mix_Chunk* chunk;
 public:
 	Chunk();
-	Chunk(int);
 	virtual ~Chunk();
 	void loadFile(string);
-	void playSound(int looping = ONCE);
-	void stopSound();
-	int isPlaying();
-	void changeVolume(int);
+	void playSound(int looping = ONCE, int channel = -1);
+	void stopSound(int);
+	int isPlaying(int);
+	void changeVolume(int, int);
 };
 
 #endif /* CHUNK_H_ */
