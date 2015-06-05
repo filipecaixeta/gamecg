@@ -7,15 +7,6 @@ class btCollisionShape;
 
 #include "BulletDynamics/Vehicle/btRaycastVehicle.h"
 #include "BulletDynamics/Dynamics/btDynamicsWorld.h"
-#include "BulletCollision/CollisionShapes/btCollisionShape.h"
-#include "BulletCollision/CollisionShapes/btBoxShape.h"
-#include "BulletCollision/CollisionShapes/btSphereShape.h"
-#include "BulletCollision/CollisionShapes/btCompoundShape.h"
-#include "BulletCollision/CollisionShapes/btUniformScalingShape.h"
-#include "BulletDynamics/ConstraintSolver/btConstraintSolver.h"
-#include "LinearMath/btQuickprof.h"
-#include "LinearMath/btDefaultMotionState.h"
-#include "LinearMath/btSerializer.h"
 
 #include <glm/glm.hpp>
 
@@ -82,41 +73,7 @@ public:
 	glm::mat4 GetVehicleMatrix();
 	btDynamicsWorld* GetDynamicsWorld();
 
-
-	float		m_cameraHeight;
-
-	float	m_minCameraDistance;
-	float	m_maxCameraDistance;
-
-	virtual void clientMoveAndDisplay();
-
-	virtual void	clientResetScene();
-
-	virtual void displayCallback();
-	
-	///a very basic camera following the vehicle
-	virtual void updateCamera();
-
-	virtual void specialKeyboard(int key, int x, int y);
-
-	virtual void specialKeyboardUp(int key, int x, int y);
-
-	void renderme();
-
-	static DemoApplication* Create()
-	{
-		VehiclePhysic* demo = new VehiclePhysic();
-		demo->myinit();
-		demo->initPhysics();
-		return demo;
-	}
-
 private:
-	///this is the most important class
-	//TODO: Maybe move this to a physics class
-	/*btDynamicsWorld*	m_dynamicsWorld;
-	btScalar			m_defaultContactProcessingThreshold;*/
-
 	float	gEngineForce;
 	float	gBreakingForce;
 
@@ -149,6 +106,39 @@ private:
 
 	void CreateVehicle();
 	btRigidBody*	localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape);
+
+
+//FOR DEBUG ONLY. DO NOT CHANGE!
+public:
+
+	float		m_cameraHeight;
+
+	float	m_minCameraDistance;
+	float	m_maxCameraDistance;
+
+	virtual void clientMoveAndDisplay();
+
+	virtual void	clientResetScene();
+
+	virtual void displayCallback();
+	
+	///a very basic camera following the vehicle
+	virtual void updateCamera();
+
+	virtual void specialKeyboard(int key, int x, int y);
+
+	virtual void specialKeyboardUp(int key, int x, int y);
+
+	void renderme();
+
+	static DemoApplication* Create()
+	{
+		VehiclePhysic* demo = new VehiclePhysic();
+		demo->myinit();
+		demo->initPhysics();
+		return demo;
+	}
+
 };
 
 
