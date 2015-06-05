@@ -142,6 +142,10 @@ suspensionRestLength(0.6)
 	tmp->loadFile("../sound/effect/brake1.wav");
 	tmp->changeVolume(5, 70);
 	effect.push_back(tmp);
+	tmp = new Chunk();
+	tmp->loadFile("../sound/effect/start1.wav");
+	tmp->changeVolume(4, 90);
+	effect.push_back(tmp);
 }
 
 VehiclePhysic::~VehiclePhysic()
@@ -280,11 +284,11 @@ void VehiclePhysic::MoveVehicle()
 	}
 
 	//Sound Without press key
-	if(!(effect[0]->isPlaying(6)) && m_vehicle->getCurrentSpeedKmHour() > 50.0)
+	if(!(effect[0]->isPlaying(6)) && !(effect[1]->isPlaying(5)) && m_vehicle->getCurrentSpeedKmHour() > 50.0)
 	{
 		effect[0]->playSound(LOOPING, 6);
 	}
-	if((effect[0]->isPlaying(6)) && m_vehicle->getCurrentSpeedKmHour() < 30.0)
+	if((effect[0]->isPlaying(6)) && m_vehicle->getCurrentSpeedKmHour() < 20.0)
 	{
 		effect[0]->stopSound(6);
 	}
@@ -295,7 +299,7 @@ void VehiclePhysic::MoveVehicle()
 	}
 
 	std::cout << "KmHour: " << m_vehicle->getCurrentSpeedKmHour() << std::endl;
-	if(accel.size() == 30)
+	if(accel.size() == 20)
 	{
 		accel.pop();
 	}
@@ -389,11 +393,17 @@ void VehiclePhysic::KeyDown(int key)
 		gEngineForce = maxEngineForce - m_vehicle->getCurrentSpeedKmHour() * 50.0;
 		if(gEngineForce < 2000.0f)
 			gEngineForce = 2000.0f;
-		if(!(effect[0]->isPlaying(6)))
+
+		gBreakingForce = 0.f;
+		
+		if(!(effect[0]->isPlaying(6)) && !(effect[2]->isPlaying(4)))
 		{
 			effect[0]->playSound(LOOPING, 6);
 		}
-		gBreakingForce = 0.f;
+		if(fabs(m_vehicle->getCurrentSpeedKmHour()) < 2.0 && !(effect[2]->isPlaying(4)))
+		{
+			effect[2]->playSound(ONCE, 4);
+		}
 	}
 	if(key == KEY_BACK)
 	{			
@@ -412,6 +422,7 @@ void VehiclePhysic::KeyDown(int key)
 		if (accel.front() - accel.back() > BREAKING_THRESHOLD)
 		{
 			effect[0]->stopSound(6);
+			effect[2]->stopSound(4);
 			if(!(effect[1]->isPlaying(5)))
 				effect[1]->playSound(ONCE, 5);
 		}
@@ -424,7 +435,7 @@ void VehiclePhysic::KeyUp(int key)
 {
 	if(key == KEY_LEFT || key == KEY_RIGHT) 
 	{
-		gVehicleSteering *= 0.8;
+		gVehicleSteering *= 0.95;
 	}
     if(key == KEY_FORWARD || key == KEY_BACK)
 	{
