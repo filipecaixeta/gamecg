@@ -29,17 +29,17 @@ m_minCameraDistance(3.f),
 m_maxCameraDistance(10.f),
 gEngineForce(0.f),
 gBreakingForce(0.f),
-maxEngineForce(10000.f),//this should be engine/velocity dependent
+maxEngineForce(12000.f),//this should be engine/velocity dependent
 maxBreakingForce(200.f),
 gVehicleSteering(0.f),
 steeringIncrement(0.04f),
-steeringIncrementMin(0.0008f),
+steeringIncrementMin(0.0025f),
 steeringIncrementMax(0.04f),
-steeringClamp(0.35f),
+steeringClamp(0.25f),
 wheelRadius(0.5f),
 wheelWidth(0.2f),
 wheelFriction(1000),//BT_LARGE_
-suspensionStiffness(20.f),
+suspensionStiffness(19.f),
 suspensionDamping(2.3f),
 suspensionCompression(4.4f),
 rollInfluence(0.1f),//1.0f;
@@ -116,7 +116,7 @@ suspensionRestLength(0.6)
 
 	tr.setOrigin(btVector3(0.0f,0.0f,0.0f));
 
-	m_carChassis = localCreateRigidBody(1000,tr,compound);//chassisShape);
+	m_carChassis = localCreateRigidBody(1500,tr,compound);//chassisShape);
 	
 	m_wheelShape = new btCylinderShapeX(btVector3(wheelWidth,wheelRadius,wheelRadius));
 
@@ -205,6 +205,10 @@ void VehiclePhysic::CreateVehicle(Car *car)
 
 	// add wheels
     // front left
+    std::cout << "WHEELS" << std::endl << car->Tire_fl_center.x << " " << car->Tire_fl_center.y << " " << car->Tire_fl_center.z << std::endl;
+    std::cout << car->Tire_fr_center.x << " " << car->Tire_fr_center.y << " " << car->Tire_fr_center.z << std::endl;
+    std::cout << car->Tire_br_center.x << " " << car->Tire_br_center.y << " " << car->Tire_br_center.z << std::endl;
+    std::cout << car->Tire_bl_center.x << " " << car->Tire_bl_center.y << " " << car->Tire_bl_center.z << std::endl << std::endl;
     btVector3 connectionPointCS0(car->Tire_fl_center.x,car->Tire_fl_center.y,car->Tire_fl_center.z);
     m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
     
@@ -389,7 +393,7 @@ void VehiclePhysic::KeyUp(int key)
 {
 	if(key == KEY_LEFT || key == KEY_RIGHT) 
 	{
-		gVehicleSteering *= 0.2;
+		gVehicleSteering *= 0.8;
 	}
     if(key == KEY_FORWARD || key == KEY_BACK)
 	{
@@ -552,7 +556,7 @@ void VehiclePhysic::initPhysics()
 
 	tr.setOrigin(btVector3(0,0.f,0));
 
-	m_carChassis = localCreateRigidBody(800,tr,compound);//chassisShape);
+	m_carChassis = localCreateRigidBody(1700,tr,compound);//chassisShape);
 	
 	m_wheelShape = new btCylinderShapeX(btVector3(wheelWidth,wheelRadius,wheelRadius));
 
@@ -569,21 +573,21 @@ m_minCameraDistance(3.f),
 m_maxCameraDistance(10.f),
 gEngineForce(0.f),
 gBreakingForce(0.f),
-maxEngineForce(2000.f),//this should be engine/velocity dependent
+maxEngineForce(12000.f),//this should be engine/velocity dependent
 maxBreakingForce(200.f),
 gVehicleSteering(0.f),
 steeringIncrement(0.04f),
-steeringIncrementMin(0.0005f),
+steeringIncrementMin(0.0025f),
 steeringIncrementMax(0.04f),
-steeringClamp(0.3f),
+steeringClamp(0.25f),
 wheelRadius(0.5f),
 wheelWidth(0.2f),
 wheelFriction(1000),//BT_LARGE_
-suspensionStiffness(20.f),
+suspensionStiffness(18.f),
 suspensionDamping(2.3f),
 suspensionCompression(4.4f),
 rollInfluence(0.1f),//1.0f;
-suspensionRestLength(1.0)
+suspensionRestLength(0.6)
 {
 	m_vehicle = 0;
 	m_wheelShape = 0;
@@ -616,17 +620,17 @@ void VehiclePhysic::CreateVehicle()
 
 	// add wheels
     // front left
-    btVector3 connectionPointCS0(CUBE_HALF_EXTENT-(0.3*wheelWidth), connectionHeight, 2*CUBE_HALF_EXTENT-wheelRadius);
+    btVector3 connectionPointCS0(1.16328, 0.507304, 2.01659);
     m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
     // front right
-    connectionPointCS0 = btVector3(-CUBE_HALF_EXTENT+(0.3*wheelWidth), connectionHeight, 2*CUBE_HALF_EXTENT-wheelRadius);
+    connectionPointCS0 = btVector3(-1.17194,0.507304,2.02218);
     m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
     isFrontWheel = false;
     // rear right
-    connectionPointCS0 = btVector3(-CUBE_HALF_EXTENT+(0.3*wheelWidth), connectionHeight, -2*CUBE_HALF_EXTENT+wheelRadius);
+    connectionPointCS0 = btVector3(-1.1897, 0.507304, -2.08176);
     m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
     // rear left
-    connectionPointCS0 = btVector3(CUBE_HALF_EXTENT-(0.3*wheelWidth), connectionHeight, -2*CUBE_HALF_EXTENT+wheelRadius);
+    connectionPointCS0 = btVector3(1.19157, 0.507304, -2.08176);
     m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
 	
 	for (int i = 0; i < m_vehicle->getNumWheels(); i++)

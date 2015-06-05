@@ -27,7 +27,7 @@
 
 
 //TEST*************************************
-// #define DEBUG_MODE
+//#define DEBUG_MODE
 #ifdef DEBUG_MODE
 #include "GlutStuff.h"
 #include "GLDebugDrawer.h"
