@@ -7,11 +7,6 @@
 
 // By default, Bullet Vehicle uses Y as up axis.
 
-//either use heightfield or triangle mesh
-#define  USE_TRIMESH_GROUND 1	
-//#define  LOAD_FROM_FILE
-//
-
 int rightIndex = 0;
 int upIndex = 1;
 int forwardIndex = 2;
@@ -49,6 +44,24 @@ vertStride(0)
 		if(i % 5 == 0)
 			carPosRot[i] = 1.0;
 	}
+
+	//Car Constraints
+	gEngineForce = 0.f;
+	gBreakingForce = 0.f;
+
+	maxEngineForce = 3000.f;//this should be engine/velocity dependent
+	maxBreakingForce = 200.f;
+
+	gVehicleSteering = 0.f;
+	steeringIncrement = 0.08f;
+	steeringClamp = 0.4f;
+	wheelRadius = 0.5f;
+	wheelWidth = 0.2f;
+	wheelFriction = 1000;//BT_LARGE_FLOAT;
+	suspensionStiffness = 20.f;
+	suspensionDamping = 2.3f;
+	suspensionCompression = 4.4f;
+	rollInfluence = 0.1f;//1.0f;
 }
 
 VehiclePhysic::VehiclePhysic(int totalTriangles, int* gIndices, int indexStride, int totalVerts, float* firstElement, int vertStride) : 
@@ -74,6 +87,24 @@ vertStride(vertStride)
 		if(i % 5 == 0)
 			carPosRot[i] = 1.0;
 	}
+
+	//Car Constraints
+	gEngineForce = 0.f;
+	gBreakingForce = 0.f;
+
+	maxEngineForce = 3000.f;//this should be engine/velocity dependent
+	maxBreakingForce = 200.f;
+
+	gVehicleSteering = 0.f;
+	steeringIncrement = 0.08f;
+	steeringClamp = 0.4f;
+	wheelRadius = 0.5f;
+	wheelWidth = 0.2f;
+	wheelFriction = 1000;//BT_LARGE_FLOAT;
+	suspensionStiffness = 20.f;
+	suspensionDamping = 2.3f;
+	suspensionCompression = 4.4f;
+	rollInfluence = 0.1f;//1.0f;
 }
 
 VehiclePhysic::~VehiclePhysic()
@@ -141,7 +172,7 @@ void VehiclePhysic::initPhysics()
 	tr.setIdentity();
 	tr.setOrigin(btVector3(0,-3.f,0));
 
-#ifdef USE_TRIMESH_GROUND
+// Create Mesh **********************************************
 	const float TRIANGLE_SIZE=20.f;
 
 	//create a triangle mesh ground
@@ -197,66 +228,7 @@ void VehiclePhysic::initPhysics()
 
 	m_collisionShapes.push_back(groundShape);
 
-#else	//height field terrain shape
-	int width=128;
-	int length=128;
-
-
-#ifdef LOAD_FROM_FILE
-	unsigned char* heightfieldData = new unsigned char[width*length];
-	{
-		for (int i=0;i<width*length;i++)
-		{
-			heightfieldData[i]=0;
-		}
-	}
-
-	char*	filename="heightfield128x128.cpp";
-	FILE* heightfieldFile = fopen(filename,"r");
-	if (!heightfieldFile)
-	{
-		filename="../heightfield/heightfield128x128.raw";
-		heightfieldFile = fopen(filename,"r");
-	}
-	if (heightfieldFile)
-	{
-		int numBytes =fread(heightfieldData,1,width*length,heightfieldFile);
-		//btAssert(numBytes);
-		if (!numBytes)
-		{
-			printf("couldn't read heightfield at %s\n",filename);
-		}
-		fclose (heightfieldFile);
-	}
-#else
-	char* heightfieldData = MyHeightfield;
-#endif
-
-
-	//btScalar maxHeight = 20000.f;//exposes a bug
-	btScalar maxHeight = 100;
-	
-	bool useFloatDatam=false;
-	bool flipQuadEdges=false;
-
-	btHeightfieldTerrainShape* heightFieldShape = new btHeightfieldTerrainShape(width,length,heightfieldData,maxHeight,upIndex,useFloatDatam,flipQuadEdges);;
-	btVector3 mmin,mmax;
-	heightFieldShape->getAabb(btTransform::getIdentity(),mmin,mmax);
-
-	groundShape = heightFieldShape;
-	
-	heightFieldShape->setUseDiamondSubdivision(true);
-
-	btVector3 localScaling(100,1,100);
-	localScaling[upIndex]=1.f;
-	groundShape->setLocalScaling(localScaling);
-
-	//tr.setOrigin(btVector3(0,9940,0));
-	tr.setOrigin(btVector3(0,49.4,0));
-
-	m_collisionShapes.push_back(groundShape);
-
-#endif	// heightfield
+	//********************************************************************
 
 	//CreateTerrain(tr, groundShape);
 	//create ground object
@@ -574,6 +546,7 @@ btDynamicsWorld* VehiclePhysic::GetDynamicsWorld()
 
 
 
+//USED ONLY FOR DEBUG! DO NOT CHANGE
 
 //to be implemented by the demo
 void VehiclePhysic::renderme()
@@ -667,27 +640,12 @@ void VehiclePhysic::clientMoveAndDisplay()
 #endif //VERBOSE_FEEDBACK
 
 	}
-
-	
-	
-
-
-
-
-#ifdef USE_QUICKPROF 
-        btProfiler::beginBlock("render"); 
-#endif //USE_QUICKPROF 
-
-
 	renderme(); 
 
 	//optional but useful: debug drawing
 	if (m_dynamicsWorld)
 		m_dynamicsWorld->debugDrawWorld();
 
-#ifdef USE_QUICKPROF 
-        btProfiler::endBlock("render"); 
-#endif 
 	
 
 	glFlush();
