@@ -207,6 +207,7 @@ void VehiclePhysic::CreateVehicle(Car *car)
     // front left
     btVector3 connectionPointCS0(car->Tire_fl_center.x,car->Tire_fl_center.y,car->Tire_fl_center.z);
     m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
+    
     // front right
     connectionPointCS0 = btVector3(car->Tire_fr_center.x,car->Tire_fr_center.y,car->Tire_fr_center.z);
     m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
