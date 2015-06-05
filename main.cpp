@@ -72,7 +72,8 @@ int directionKey=0;
 int brakeKey = 0;
 int cameraMode=1;
 float carang=0.0;
-float carang2=0.0;
+float frontWheelAng=0.0;
+float frontWheelAngMax=1.0;
 int sentido=1;
 std::queue<vec3> eyePosQ;
 std::queue<vec3> lookAtPosQ;
@@ -85,11 +86,15 @@ void renderCar(int carNr)
 	char key[50];
 	sprintf(key,"car%d",carNr);
 
-	cars[key]->updateFrontWheel(carang2);
-	cars[key]->spinWheel(carang);
+	cars[key]->updateFrontWheel(frontWheelAng);
+	static float speed=0.0;
+	speed+=MainCar->m_vehicle->getCurrentSpeedKmHour()/400.0;
+	if (speed>M_PI)
+		speed-=M_PI;
+	cars[key]->spinWheel(speed);
 	carang+=0.5;
-	carang2+=0.01*sentido;
-	if (fabs(carang2)>1.0)
+	// frontWheelAng+=0.01*sentido;
+	if (fabs(frontWheelAng)>1.0)
 	{
 		if (sentido==1)
 			sentido=-1;
@@ -182,14 +187,26 @@ void displayWin()
 	if (directionKey==GLUT_KEY_RIGHT)
 	{
 		MainCar->KeyDown(KEY_RIGHT);
+		frontWheelAng-=0.02;
+		if (frontWheelAng<-frontWheelAngMax)
+			frontWheelAng=-frontWheelAngMax;
 	}
 	else if (directionKey==GLUT_KEY_LEFT)
 	{
 		MainCar->KeyDown(KEY_LEFT);
+		frontWheelAng+=0.02;
+		if (frontWheelAng>frontWheelAngMax)
+			frontWheelAng=frontWheelAngMax;
 	}
 	else if (directionKey == 0)
 	{
 		MainCar->KeyUp(KEY_LEFT);
+		if (frontWheelAng>0.0)
+			frontWheelAng-=0.06;
+		else if (frontWheelAng<0.0)
+			frontWheelAng+=0.06;
+		if (abs(frontWheelAng)<0.06)
+			frontWheelAng=0.0;
 	}
 
 	if(brakeKey)
@@ -233,7 +250,7 @@ void init()
 	shaders["scenario"]	= new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
 
 	// Load the scenario mesh
-	scenario = new Scenario(baseDir+"3dModels/city14/city.obj");
+	scenario = new Scenario(baseDir+"3dModels/city7/city.obj");
 
 	// Load one car mesh
 	for (int carNr: carsList)

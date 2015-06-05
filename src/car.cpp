@@ -87,18 +87,18 @@ void Car::updateFrontWheel(float ang)
 	for(Mesh *m: Tire_fl)
 	{
 		m->transformation = glm::translate(mat4(1.0f),Tire_fl_center);
-		m->transformation = glm::rotate(m->transformation,ang,glm::vec3(0.0f,1.0f,0.0f));
+		m->transformation = glm::rotate(m->transformation,ang*0.8f,glm::vec3(0.0f,1.0f,0.0f));
 		m->transformation = glm::translate(m->transformation,-Tire_fl_center);
 	}
 	for(Mesh *m: Tire_fr)
 	{
 		m->transformation = glm::translate(mat4(1.0f),Tire_fr_center);
-		m->transformation = glm::rotate(m->transformation,ang,glm::vec3(0.0f,1.0f,0.0f));
+		m->transformation = glm::rotate(m->transformation,ang*0.8f,glm::vec3(0.0f,1.0f,0.0f));
 		m->transformation = glm::translate(m->transformation,-Tire_fr_center);
 	}
 	steeringwheel->transformation = glm::translate(mat4(1.0f),steeringwheel->center);
 	steeringwheel->transformation = glm::rotate(steeringwheel->transformation,0.261799f,glm::vec3(1.0f,0.0f,0.0f));
-	steeringwheel->transformation = glm::rotate(steeringwheel->transformation,-ang,glm::vec3(0.0f,0.0f,1.0f));
+	steeringwheel->transformation = glm::rotate(steeringwheel->transformation,-ang*2,glm::vec3(0.0f,0.0f,1.0f));
 	steeringwheel->transformation = glm::rotate(steeringwheel->transformation,-0.261799f,glm::vec3(1.0f,0.0f,0.0f));
 	steeringwheel->transformation = glm::translate(steeringwheel->transformation,-steeringwheel->center);
 }
