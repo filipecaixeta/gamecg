@@ -123,7 +123,7 @@ vec4 light1()
 float getFogFactor(float fFogCoord)
 {
    // float fResult = (400.0f-fFogCoord)/(400.0f-10.0f);
-   float fResult = exp(-pow(0.005f*fFogCoord, 2.0)); 
+   float fResult = exp(-pow(0.008f*fFogCoord, 2.0)); 
    fResult = 1.0-clamp(fResult, 0.0, 1.0);
    return fResult;
 }
@@ -132,6 +132,6 @@ void main()
 {
     vec4 outputColor = light1();
     float fFogCoord = abs(vEyeSpacePos.z/vEyeSpacePos.w);
-    outputColor = mix(outputColor, vec4(0.2f,0.2f,0.2f,1.0f), getFogFactor(fFogCoord)); 
+    outputColor = mix(outputColor, vec4(0.4f,0.4f,0.4f,1.0f), getFogFactor(fFogCoord)); 
     gl_FragColor = outputColor;
 }

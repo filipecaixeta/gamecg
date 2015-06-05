@@ -67,6 +67,8 @@ suspensionRestLength(0.6)
 
 	for (Mesh &m: scenario->model.meshes)
 	{
+		if (m.meshName.find("no_colision")==0)
+			continue;
 		Mesh* meshP;
 		meshP=&m;
 
