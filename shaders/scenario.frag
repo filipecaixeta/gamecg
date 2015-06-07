@@ -123,7 +123,7 @@ vec4 light1()
 float getFogFactor(float fFogCoord)
 {
    // float fResult = (400.0f-fFogCoord)/(400.0f-10.0f);
-   float fResult = exp(-pow(0.008f*fFogCoord, 2.0)); 
+   float fResult = exp(-pow(0.003f*fFogCoord, 2.0)); 
    fResult = 1.0-clamp(fResult, 0.0, 1.0);
    return fResult;
 }

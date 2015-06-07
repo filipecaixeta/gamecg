@@ -79,6 +79,8 @@ std::queue<vec3> eyePosQ;
 std::queue<vec3> lookAtPosQ;
 bool blending=true;
 bool stopCamera=false;
+vec2 camera1Rotation=vec2(0.0f,0.0f);
+vec2 mouselast=vec2(0,0);
 
 void renderCar(int carNr)
 {
@@ -99,16 +101,19 @@ void renderCar(int carNr)
 	mat4 ModelCamera = MainCar->GetVehicleMatrix()*glm::rotate(mat4(1.0f),ang,glm::vec3(0.0,1.0,0.0));
 	Model = MainCar->GetVehicleMatrix() * Model;
 	vec4 v;
-	
 	blending=true;
 	if (cameraMode==1)
 	{
-		if (string(key)=="car2")
-			v=Model*vec4(0.35f,1.016,0.3f,1.0f);
-		else if (string(key)=="car9")
-			v=Model*vec4(0.35f,1.55,-0.5f,1.0f);
+		v=Model*vec4(0.35f,1.55,-0.5f,1.0f);
 		camera->eyePos=vec3(v.x,v.y,v.z);
-		v=Model*vec4(0.0f,1.0f,6.0f,1.0f);
+
+		mat4 rot;
+		rot=glm::translate(mat4(1.0f),vec3(0.35f,1.55,-0.5f));
+		rot=glm::rotate(rot,camera1Rotation.x,vec3(0.0f,1.0f,0.0f));
+		rot=glm::rotate(rot,camera1Rotation.y,vec3(1.0f,0.0f,0.0f));
+		rot=glm::translate(rot,-vec3(0.35f,1.55,-0.5f));
+
+		v=Model*rot*vec4(0.35f,1.55,-0.1f,1.0f);
 		camera->lookAtPos=vec3(v.x,v.y,v.z);
 		music.changeVolume(110);
 		blending=false;
@@ -368,6 +373,26 @@ void keyBoardUpFunc(unsigned char key, int, int)
 			break;
 	}
 }
+void motionFunc(int x, int y)
+{
+	vec2 current=vec2(x,y);
+	vec2 temp=(current-mouselast)*0.01f;
+	camera1Rotation.x+=temp.x;
+	camera1Rotation.y+=temp.y;
+	if (camera1Rotation.y<-0.35)
+		camera1Rotation.y=-0.35;
+	if (camera1Rotation.y>0.7)
+		camera1Rotation.y=0.7;
+	mouselast=current;
+}
+
+void processMouse(int button, int state, int x, int y)
+{
+	mouselast=vec2(x,y);
+	if (state==GLUT_UP)
+		camera1Rotation=vec2(0.0f,0.0f);
+}
+
 int main(int argc, char *argv[])
 {
 	
@@ -382,7 +407,8 @@ int main(int argc, char *argv[])
     glutInitWindowPosition(10,10);
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH /* | GLUT_MULTISAMPLE */);
  	glutCreateWindow(windowName);
- 	
+ 	glutSetCursor(GLUT_CURSOR_NONE);
+
  	glEnable(GL_DEPTH_TEST); 
  	glEnable ( GL_ALPHA_TEST );
 
@@ -404,6 +430,8 @@ int main(int argc, char *argv[])
 	glutKeyboardUpFunc(keyBoardUpFunc);
 	glutSpecialFunc(processSpecialKeys);
 	glutSpecialUpFunc(keyBoardUp);
+	glutMotionFunc(motionFunc);
+	glutMouseFunc(processMouse);
     glutMainLoop();
     return 0;
 
