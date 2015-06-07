@@ -19,7 +19,7 @@ class Model
 public:
 	Model(string path);
 	~Model();
-	void draw(Shader *shader);
+	void draw(Shader *shader,bool blending);
 	void processNode(aiNode* node, const aiScene* scene);
 	void processMesh(aiMesh* mesh, const aiScene* scene, aiNode* node);
 	vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type);

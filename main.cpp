@@ -55,6 +55,9 @@ void changeMusic();
 Light light(vec3(0.0f,2.0f,10.0f));
 Camera *camera;
 
+vector<int> carsList={9};
+string scenarioName="3dModels/city14/city.obj";
+
 VehiclePhysic* MainCar;
 //Sounds
 Music music;
@@ -65,7 +68,6 @@ std::map<std::string,Shader*> shaders;
 std::map<std::string,Car*> cars;
 Scenario *scenario;
 float ang=0;
-vector<int> carsList={9};
 int gkey=0;
 int speedKey=0;
 int directionKey=0;
@@ -75,6 +77,8 @@ float frontWheelAng=0.0;
 float frontWheelAngMax=1.0;
 std::queue<vec3> eyePosQ;
 std::queue<vec3> lookAtPosQ;
+bool blending=true;
+bool stopCamera=false;
 
 void renderCar(int carNr)
 {
@@ -86,7 +90,7 @@ void renderCar(int carNr)
 
 	cars[key]->updateFrontWheel(frontWheelAng);
 	static float speed=0.0;
-	speed+=MainCar->m_vehicle->getCurrentSpeedKmHour()/400.0;
+	speed+=MainCar->m_vehicle->getCurrentSpeedKmHour()/200.0;
 	if (speed>M_PI)
 		speed-=M_PI;
 	cars[key]->spinWheel(speed);
@@ -96,6 +100,7 @@ void renderCar(int carNr)
 	Model = MainCar->GetVehicleMatrix() * Model;
 	vec4 v;
 	
+	blending=true;
 	if (cameraMode==1)
 	{
 		if (string(key)=="car2")
@@ -106,6 +111,7 @@ void renderCar(int carNr)
 		v=Model*vec4(0.0f,1.0f,6.0f,1.0f);
 		camera->lookAtPos=vec3(v.x,v.y,v.z);
 		music.changeVolume(110);
+		blending=false;
 	}
 	if (cameraMode==2)
 	{
@@ -123,7 +129,7 @@ void renderCar(int carNr)
 	}
 	if (cameraMode==3)
 	{
-		v=ModelCamera*vec4(5*sin(ang),4.0,5*cos(ang),1.0f);
+		v=ModelCamera*vec4(7*sin(ang),4.0,7*cos(ang),1.0f);
 		camera->eyePos=vec3(v.x,v.y,v.z);
 
 		v=ModelCamera*vec4(0.0f,0.0f,0.0f,1.0f);
@@ -138,7 +144,7 @@ void renderCar(int carNr)
 	light.loadToShader(program);
 	camera->loadToShader(program,Model);
 
-    cars[key]->draw(shaders["car"]);
+    cars[key]->draw(shaders["car"],blending);
 }
 void renderScene()
 {
@@ -152,7 +158,7 @@ void renderScene()
 	light.loadToShader(program);
 	camera->loadToShader(program,Model);
 
-    scenario->draw(shaders["scenario"]);
+    scenario->draw(shaders["scenario"],false);
 }
 void displayWin()
 {
@@ -209,12 +215,12 @@ void displayWin()
 
 	MainCar->MoveVehicle();
 
+	renderScene();
 	for (int carNr: carsList)
 	{
 		renderCar(carNr);
 	}
 
-	renderScene();
 
     static float lastTime=std::clock();
     static int frameN=0;
@@ -226,8 +232,8 @@ void displayWin()
     	std::cout << "Time per Frame = " << temp << std::endl;
     	lastTime=std::clock();
     }
-
-    ang+=0.003;
+    if (!stopCamera)
+    	ang+=0.003;
 	glutSwapBuffers();
 }
 
@@ -239,7 +245,7 @@ void init()
 	shaders["scenario"]	= new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
 
 	// Load the scenario mesh
-	scenario = new Scenario(baseDir+"3dModels/city14/city.obj");
+	scenario = new Scenario(baseDir+scenarioName);
 
 	// Load one car mesh
 	for (int carNr: carsList)
@@ -304,6 +310,9 @@ void keyBoardFunc(unsigned char key, int, int)
 			cameraMode++;
 			if (cameraMode==4)
 				cameraMode=1;
+			break;
+		case 'v':
+			stopCamera=!stopCamera;
 			break;
 		case 'w':
 			speedKey=GLUT_KEY_UP;
@@ -371,14 +380,13 @@ int main(int argc, char *argv[])
 	glutInit(&argc, argv);
     glutInitWindowSize(wWidth,wHeight);
     glutInitWindowPosition(10,10);
-    glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH /* | GLUT_MULTISAMPLE */);
  	glutCreateWindow(windowName);
  	
  	glEnable(GL_DEPTH_TEST); 
- 	glEnable ( GL_ALPHA_TEST ) ;
- 	glAlphaFunc ( GL_GREATER, 0.8 ) ;
- 	
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+ 	glEnable ( GL_ALPHA_TEST );
+
+ 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
  	camera = new Camera(vec3(0.0f,5.0f,-10.0f),vec3(0.0,0.0,0.0),wWidth,wHeight);
 
@@ -420,6 +428,7 @@ void loadCar(int carNr)
 	sprintf(path,"%s/3dModels/car%d/car.obj",baseDir.c_str(),carNr);
 	sprintf(key,"car%d",carNr);
 	cars[key] = new Car(path);
+	// cars[key]->setColor(vec4(0.02,0.02,0.02,1.0));
 }
 
 void clear(float r,float g, float b, float a)

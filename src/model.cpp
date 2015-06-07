@@ -11,11 +11,9 @@ using std::string;
 Model::Model(string path)
 {
 	Assimp::Importer importer;
-    std::cout << "Aqui 1"<< std::endl;
 	const aiScene* scene = importer.ReadFile(path.c_str(), 
         aiProcess_Triangulate | aiProcess_FlipUVs |
          aiProcess_GenSmoothNormals );
-    std::cout << "Aqui 2"<< std::endl;
 	if(!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		std::cout << "ERROR: ASSIMP " << importer.GetErrorString()<< std::endl;
@@ -181,8 +179,24 @@ Model::~Model()
 {
 
 }
-void Model::draw(Shader *shader)
+void Model::draw(Shader *shader,bool blending)
 {
-	for (Mesh& mesh: meshes)
-		mesh.draw(shader);
+    if (blending)
+    {
+        glDisable(GL_ALPHA_TEST);
+        glDisable(GL_BLEND);
+    }
+    else
+    {
+        glEnable (GL_ALPHA_TEST);
+        glAlphaFunc (GL_GREATER, 0.8);
+    }
+    for (Mesh& mesh: meshes)
+        if (mesh.material->name.find("GLASS_INTERIOR")!=0)
+		  mesh.draw(shader);
+    if (blending)
+        glEnable(GL_BLEND);
+    for (Mesh& mesh: meshes)
+        if (mesh.material->name.find("GLASS_INTERIOR")==0)
+            mesh.draw(shader);
 }

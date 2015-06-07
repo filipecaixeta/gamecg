@@ -68,7 +68,7 @@ suspensionRestLength(0.6)
 
 	for (Mesh &m: scenario->model.meshes)
 	{
-		if (m.meshName.find("no_colision")==0)
+		if (m.meshName.find("no_colision")==0 || m.material->name.find("no_colision")==0)
 			continue;
 		Mesh* meshP;
 		meshP=&m;
@@ -298,7 +298,7 @@ void VehiclePhysic::MoveVehicle()
 		effect[1]->stopSound(5);
 	}
 
-	std::cout << "KmHour: " << m_vehicle->getCurrentSpeedKmHour() << std::endl;
+	// std::cout << "KmHour: " << m_vehicle->getCurrentSpeedKmHour() << std::endl;
 	if(accel.size() == 20)
 	{
 		accel.pop();

@@ -16,7 +16,7 @@ class Scenario
 public:
 	Scenario(string path);
 	~Scenario();
-	void draw(Shader *shader);
+	void draw(Shader *shader,bool blending);
 	Model model;
 	mat4 modelMatrix;
 };

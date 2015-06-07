@@ -8,7 +8,7 @@ Scenario::~Scenario()
 {
 
 }
-void Scenario::draw(Shader *shader)
+void Scenario::draw(Shader *shader,bool blending)
 {
-	model.draw(shader);
+	model.draw(shader,blending);
 }

@@ -19,7 +19,7 @@ public:
 	void spinWheel(float ang);
 	void setColor(vec4 color);
 	void updatePosition();
-	void draw(Shader *shader);
+	void draw(Shader *shader,bool blending);
 // private:
 	Model model;
 	mat4 modelMatrix;

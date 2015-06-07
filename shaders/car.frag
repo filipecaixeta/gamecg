@@ -81,7 +81,8 @@ vec4 light1()
     vec4 Ia=lightS.ambient;
     vec4 Id=lightS.diffuse;
     vec4 Is=lightS.specular;  
-
+    // if (material.color_transparent.a!=1)
+    //     discard;
     vec4 Kd;
     if (useTexture==1)
     {
@@ -110,9 +111,9 @@ vec4 light1()
 
     vec4 Ira = Ka*Ia;                                   // ambient reflection
     vec4 Ird = max(Kd*dot(l,n)*Id,0.0);                 // diffuse reflection
-    vec4 Irs = max(Ks*pow(dot(h,n),shininess)*Is,0.0);  // specular reflection
+    vec4 Irs = max(Ks*pow(dot(h,n),shininess*0.1)*Is,0.0);  // specular reflection
 
-    vec4 color = vec4(Ira*2+Ird*4.0+Irs*2.0);
+    vec4 color = vec4(Ira*2+Ird*5.0+Irs*1.5);
     if (material.color_emissive.xyz!=vec3(0.0,0.0,0.0))
     {
         color=color*0.5+material.color_emissive*0.5;

@@ -41,6 +41,7 @@ Car::Car(string path):model(path)
         cmax.z=fmax(m->cmax.z,cmax.z);
     }
     Tire_fl_center=(cmin+cmax)/2.0f;
+    Tire_fl_center.x-=0.15f;
     cmin=vec3(INFINITY,INFINITY,INFINITY);
 	cmax=vec3(-INFINITY,-INFINITY,-INFINITY);
 	for(Mesh *m: Tire_fr)
@@ -54,6 +55,7 @@ Car::Car(string path):model(path)
         cmax.z=fmax(m->cmax.z,cmax.z);
     }
     Tire_fr_center=(cmin+cmax)/2.0f;
+    Tire_fr_center.x+=0.15f;
     cmin=vec3(INFINITY,INFINITY,INFINITY);
 	cmax=vec3(-INFINITY,-INFINITY,-INFINITY);
 	for(Mesh *m: Tire_bl)
@@ -141,9 +143,9 @@ void Car::updatePosition()
 {
 
 }
-void Car::draw(Shader *shader)
+void Car::draw(Shader *shader, bool blending)
 {
-	model.draw(shader);
+	model.draw(shader,blending);
 }
 Car::~Car()
 {
