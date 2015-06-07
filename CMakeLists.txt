@@ -117,6 +117,7 @@ set(SOURCES
 	src/SFX.cpp
 	src/music.cpp
 	src/chunk.cpp
+	src/hud.cpp
 	src/stb_image.c)
 
 add_executable(${PROJECT_NAME} main.cpp ${SOURCES})

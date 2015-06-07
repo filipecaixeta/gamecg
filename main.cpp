@@ -7,6 +7,7 @@
 #include <map>
 #include <glm/glm.hpp>
 #include <ctime>
+#include <queue>
 
 #include <vertex.h>
 #include <texture.h>
@@ -18,7 +19,7 @@
 #include <kdtree.hpp>
 #include <light.h>
 #include <camera.h>
-#include <queue>
+#include <hud.h>
 
 #include <vehiclePhysic.h>
 #include <SFX.h>
@@ -56,7 +57,7 @@ Light light(vec3(0.0f,2.0f,10.0f));
 Camera *camera;
 
 vector<int> carsList={9};
-string scenarioName="3dModels/city14/city.obj";
+string scenarioName="3dModels/city7/city.obj";
 
 VehiclePhysic* MainCar;
 //Sounds
@@ -81,6 +82,7 @@ bool blending=true;
 bool stopCamera=false;
 vec2 camera1Rotation=vec2(0.0f,0.0f);
 vec2 mouselast=vec2(0,0);
+Hud *hud;
 
 void renderCar(int carNr)
 {
@@ -170,6 +172,7 @@ void displayWin()
 	clear(0.6,0.8,1.0,1.0);
 	shaders["car"]->reloadShader();
 	shaders["scenario"]->reloadShader();
+	shaders["hud"]->reloadShader();
 
 	if (speedKey==GLUT_KEY_UP)
 	{
@@ -220,6 +223,11 @@ void displayWin()
 
 	MainCar->MoveVehicle();
 
+	shaders["hud"]->use(true);
+	hud->setSpeed(MainCar->m_vehicle->getCurrentSpeedKmHour());
+	hud->aspect=camera->aspect;
+	hud->draw(shaders["hud"]);
+
 	renderScene();
 	for (int carNr: carsList)
 	{
@@ -249,8 +257,12 @@ void init()
 	// Shader for the scenario
 	shaders["scenario"]	= new Shader(baseDir+"shaders/scenario.vs", baseDir+"shaders/scenario.frag");
 
+	shaders["hud"]	= new Shader(baseDir+"shaders/hud.vs", baseDir+"shaders/hud.frag");
+
 	// Load the scenario mesh
 	scenario = new Scenario(baseDir+scenarioName);
+
+	hud = new Hud(baseDir+"3dModels/hud/speedometer.png");
 
 	// Load one car mesh
 	for (int carNr: carsList)
@@ -406,8 +418,10 @@ int main(int argc, char *argv[])
     glutInitWindowSize(wWidth,wHeight);
     glutInitWindowPosition(10,10);
     glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH /* | GLUT_MULTISAMPLE */);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH  | GLUT_MULTISAMPLE );
  	glutCreateWindow(windowName);
  	glutSetCursor(GLUT_CURSOR_NONE);
+ 	glLineWidth(5);
 
  	glEnable(GL_DEPTH_TEST); 
  	glEnable ( GL_ALPHA_TEST );
