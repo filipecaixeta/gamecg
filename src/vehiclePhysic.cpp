@@ -499,6 +499,12 @@ btDynamicsWorld* VehiclePhysic::GetDynamicsWorld()
 
 
 
+
+
+
+
+
+
 //USED ONLY FOR DEBUG! DO NOT CHANGE
 
 void VehiclePhysic::initPhysics()
