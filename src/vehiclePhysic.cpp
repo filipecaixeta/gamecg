@@ -43,7 +43,7 @@ wheelFriction(1000),//BT_LARGE_
 suspensionStiffness(19.f),
 suspensionDamping(2.3f),
 suspensionCompression(4.4f),
-rollInfluence(0.1f),//1.0f;
+rollInfluence(0.01f),//1.0f;
 suspensionRestLength(0.6)
 {
 
@@ -102,7 +102,7 @@ suspensionRestLength(0.6)
 	}
 
 	vec3 sizeCar=vec3(car->model.cmax-car->model.cmin)/2.0f;
-	std::cout << sizeCar.x << " " << sizeCar.y << " " << sizeCar.z << std::endl;
+
 	btCollisionShape* chassisShape = new btBoxShape(btVector3(sizeCar.x,sizeCar.y,sizeCar.z));
 	m_collisionShapes.push_back(chassisShape);
 
@@ -215,10 +215,6 @@ void VehiclePhysic::CreateVehicle(Car *car)
 
 	// add wheels
     // front left
-    std::cout << "WHEELS" << std::endl << car->Tire_fl_center.x << " " << car->Tire_fl_center.y << " " << car->Tire_fl_center.z << std::endl;
-    std::cout << car->Tire_fr_center.x << " " << car->Tire_fr_center.y << " " << car->Tire_fr_center.z << std::endl;
-    std::cout << car->Tire_br_center.x << " " << car->Tire_br_center.y << " " << car->Tire_br_center.z << std::endl;
-    std::cout << car->Tire_bl_center.x << " " << car->Tire_bl_center.y << " " << car->Tire_bl_center.z << std::endl << std::endl;
     btVector3 connectionPointCS0(car->Tire_fl_center.x,car->Tire_fl_center.y,car->Tire_fl_center.z);
     m_vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, m_tuning, isFrontWheel);
     
