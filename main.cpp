@@ -45,7 +45,7 @@ Light light(vec3(0.0f,2.0f,10.0f));
 Camera *camera;
 
 vector<int> carsList={9};
-string scenarioName="3dModels/city7/city.obj";
+string scenarioName="3dModels/city14/city.obj";
 
 VehiclePhysic* MainCar;
 //Sounds
@@ -214,8 +214,8 @@ void displayWin()
 	shaders["hud"]->use(true);
 	hud->setSpeed(MainCar->m_vehicle->getCurrentSpeedKmHour());
 	hud->aspect=camera->aspect;
-	hud->draw(shaders["hud"]);
 
+	hud->draw(shaders["hud"]);
 	renderScene();
 	for (int carNr: carsList)
 	{
@@ -250,13 +250,15 @@ void init()
 	// Load the scenario mesh
 	scenario = new Scenario(baseDir+scenarioName);
 
-	hud = new Hud(baseDir+"3dModels/hud/speedometer.png");
 
+	
 	// Load one car mesh
 	for (int carNr: carsList)
 	{
 		loadCar(carNr);
 	}
+
+	hud = new Hud(baseDir+"3dModels/hud/speedometer.png");
 
 	char key[50];
 	sprintf(key,"car%d",carsList[0]);
@@ -402,8 +404,8 @@ int main(int argc, char *argv[])
 	glutInit(&argc, argv);
     glutInitWindowSize(wWidth,wHeight);
     glutInitWindowPosition(10,10);
-    glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH /* | GLUT_MULTISAMPLE */);
-    glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH  | GLUT_MULTISAMPLE );
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH );
+    // glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH  | GLUT_MULTISAMPLE );
  	glutCreateWindow(windowName);
  	glutSetCursor(GLUT_CURSOR_NONE);
  	glLineWidth(5);
