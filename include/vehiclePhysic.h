@@ -33,6 +33,16 @@ enum Keys
 	KEY_SPACE
 };
 
+enum
+{
+	ACC = 0,
+	BRAKE,
+	ON1,
+	ON2,
+	MOTOR,
+	START
+};
+
 typedef struct Wheel
 {
 	glm::vec3 pos;

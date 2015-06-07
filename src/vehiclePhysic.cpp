@@ -20,7 +20,11 @@ const int maxProxies = 32766;
 const int maxOverlap = 65535;
 
 #define CUBE_HALF_EXTENT 1
+//Sound Thresholds
 #define BREAKING_THRESHOLD 10
+#define ACCEL_THRESHOLD 2
+#define STOPED_THRESHOLD 20
+#define MAX_SPEED_THRESHOLD 200
 
 VehiclePhysic::VehiclePhysic(Scenario *scenario,Car *car): 
 m_carChassis(0),
@@ -34,7 +38,7 @@ maxEngineForce(12000.f),//this should be engine/velocity dependent
 maxBreakingForce(200.f),
 gVehicleSteering(0.f),
 steeringIncrement(0.04f),
-steeringIncrementMin(0.0025f),
+steeringIncrementMin(0.001f),
 steeringIncrementMax(0.04f),
 steeringClamp(0.25f),
 wheelRadius(0.5f),
@@ -135,15 +139,27 @@ suspensionRestLength(0.6)
 	//Start Sounds
 	Chunk *tmp;
 	tmp = new Chunk();
-	tmp->loadFile("../sound/effect/acceleratingMain.wav");
-	tmp->changeVolume(6, 70);
+	tmp->loadFile("../sound/effect/acceleration.wav");
+	tmp->changeVolume(6, 90);
 	effect.push_back(tmp);
 	tmp = new Chunk();
 	tmp->loadFile("../sound/effect/brake1.wav");
 	tmp->changeVolume(5, 70);
 	effect.push_back(tmp);
 	tmp = new Chunk();
-	tmp->loadFile("../sound/effect/start1.wav");
+	tmp->loadFile("../sound/effect/ligado1.wav");
+	tmp->changeVolume(4, 90);
+	effect.push_back(tmp);
+	tmp = new Chunk();
+	tmp->loadFile("../sound/effect/ligado2.wav");
+	tmp->changeVolume(4, 90);
+	effect.push_back(tmp);
+	tmp = new Chunk();
+	tmp->loadFile("../sound/effect/motorOn.wav");
+	tmp->changeVolume(4, 50);
+	effect.push_back(tmp);
+	tmp = new Chunk();
+	tmp->loadFile("../sound/effect/startUp.wav");
 	tmp->changeVolume(4, 90);
 	effect.push_back(tmp);
 }
@@ -279,19 +295,43 @@ void VehiclePhysic::MoveVehicle()
 		m_vehicle->setSteeringValue(gVehicleSteering,wheelIndex);
 	}
 
+	std::cout << "SPEED: " << m_vehicle->getCurrentSpeedKmHour() << std::endl;
+
 	//Sound Without press key
-	if(!(effect[0]->isPlaying(6)) && !(effect[1]->isPlaying(5)) && m_vehicle->getCurrentSpeedKmHour() > 50.0)
+	if((effect[ACC]->isPlaying(ACC+2)) && accel.back() - accel.front() < ACCEL_THRESHOLD)
 	{
-		effect[0]->playSound(LOOPING, 6);
+		effect[ACC]->stopSound(ACC+2);
 	}
-	if((effect[0]->isPlaying(6)) && m_vehicle->getCurrentSpeedKmHour() < 20.0)
+	if(!(effect[ACC]->isPlaying(ACC+2)) && !(effect[ON1]->isPlaying(ON1+2)) && !(effect[BRAKE]->isPlaying(BRAKE+2)) && fabs(m_vehicle->getCurrentSpeedKmHour()) < MAX_SPEED_THRESHOLD && fabs(m_vehicle->getCurrentSpeedKmHour()) > STOPED_THRESHOLD)
 	{
-		effect[0]->stopSound(6);
+		if(effect[ON2]->isPlaying(ON2+2))
+			effect[ON2]->stopSound(ON2+2);
+		if(effect[MOTOR]->isPlaying(MOTOR+2))
+			effect[MOTOR]->stopSound(MOTOR+2);
+		effect[ON1]->playSound(LOOPING, ON1+2);
+	}
+	else if(!(effect[ACC]->isPlaying(ACC+2)) && !(effect[ON2]->isPlaying(ON2+2)) && !(effect[BRAKE]->isPlaying(BRAKE+2)) && fabs(m_vehicle->getCurrentSpeedKmHour()) >= MAX_SPEED_THRESHOLD)
+	{
+		if(effect[ON1]->isPlaying(ON1+2))
+			effect[ON1]->stopSound(ON1+2);
+		if(effect[MOTOR]->isPlaying(MOTOR+2))
+			effect[MOTOR]->stopSound(MOTOR+2);
+		effect[ON2]->playSound(LOOPING, ON2+2);
 	}
 
-	if((effect[1]->isPlaying(5)) && m_vehicle->getCurrentSpeedKmHour() < 15.0)
+	if(!(effect[ACC]->isPlaying(ACC+2)) && !(effect[MOTOR]->isPlaying(MOTOR+2)) && fabs(m_vehicle->getCurrentSpeedKmHour()) < STOPED_THRESHOLD)
 	{
-		effect[1]->stopSound(5);
+		if(effect[ON2]->isPlaying(ON2+2))
+			effect[ON2]->stopSound(ON2+2);
+		if(effect[ON1]->isPlaying(ON1+2))
+			effect[ON1]->stopSound(ON1+2);
+		effect[MOTOR]->playSound(LOOPING, MOTOR+2);
+
+	}
+
+	if((effect[BRAKE]->isPlaying(BRAKE+2)) && fabs(m_vehicle->getCurrentSpeedKmHour()) < 15.0)
+	{
+		effect[BRAKE]->stopSound(BRAKE+2);
 	}
 
 	// std::cout << "KmHour: " << m_vehicle->getCurrentSpeedKmHour() << std::endl;
@@ -392,13 +432,16 @@ void VehiclePhysic::KeyDown(int key)
 
 		gBreakingForce = 0.f;
 		
-		if(!(effect[0]->isPlaying(6)) && !(effect[2]->isPlaying(4)))
+		if(!(effect[ACC]->isPlaying(ACC+2)) && !(effect[BRAKE]->isPlaying(BRAKE+2)) && accel.back() - accel.front() > ACCEL_THRESHOLD)
 		{
-			effect[0]->playSound(LOOPING, 6);
-		}
-		if(fabs(m_vehicle->getCurrentSpeedKmHour()) < 2.0 && !(effect[2]->isPlaying(4)))
-		{
-			effect[2]->playSound(ONCE, 4);
+			if(effect[ON1]->isPlaying(ON1+2))
+				effect[ON1]->stopSound(ON1+2);
+			if(effect[ON2]->isPlaying(ON2+2))
+				effect[ON2]->stopSound(ON2+2);
+			if(effect[MOTOR]->isPlaying(MOTOR+2))
+				effect[MOTOR]->stopSound(MOTOR+2);
+
+			effect[ACC]->playSound(LOOPING, ACC+2);
 		}
 	}
 	if(key == KEY_BACK)
@@ -417,10 +460,17 @@ void VehiclePhysic::KeyDown(int key)
 	{
 		if (accel.front() - accel.back() > BREAKING_THRESHOLD)
 		{
-			effect[0]->stopSound(6);
-			effect[2]->stopSound(4);
-			if(!(effect[1]->isPlaying(5)))
-				effect[1]->playSound(ONCE, 5);
+			if(effect[ACC]->isPlaying(ACC+2))
+				effect[ACC]->stopSound(ACC+2);
+			if(effect[ON1]->isPlaying(ON1+2))
+				effect[ON1]->stopSound(ON1+2);
+			if(effect[ON2]->isPlaying(ON2+2))
+				effect[ON2]->stopSound(ON2+2);
+			if(effect[MOTOR]->isPlaying(MOTOR+2))
+				effect[MOTOR]->stopSound(MOTOR+2);
+
+			if(!(effect[BRAKE]->isPlaying(BRAKE+2)))
+				effect[BRAKE]->playSound(ONCE, BRAKE+2);
 		}
 		gBreakingForce = maxBreakingForce;
 		gEngineForce = 0.0;
@@ -435,11 +485,14 @@ void VehiclePhysic::KeyUp(int key)
 	}
     if(key == KEY_FORWARD || key == KEY_BACK)
 	{
+		if((effect[ACC]->isPlaying(ACC+2)))
+			effect[ACC]->stopSound(ACC+2);
 		gEngineForce = 0.0;
 	}
 	if(key == KEY_SPACE)
 	{
-		effect[1]->stopSound(5);
+		if((effect[BRAKE]->isPlaying(BRAKE+2)))
+			effect[BRAKE]->stopSound(BRAKE+2);
 		gBreakingForce = 0.0;
 	}
 }

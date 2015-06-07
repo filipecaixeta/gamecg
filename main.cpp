@@ -45,7 +45,7 @@ Light light(vec3(0.0f,2.0f,10.0f));
 Camera *camera;
 
 vector<int> carsList={9};
-string scenarioName="3dModels/city14/city.obj";
+string scenarioName="3dModels/city7/city.obj";
 
 VehiclePhysic* MainCar;
 //Sounds
