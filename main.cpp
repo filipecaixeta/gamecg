@@ -26,18 +26,6 @@
 #include <music.h>
 #include <chunk.h>
 
-
-//TEST*************************************
-//#define DEBUG_MODE
-#ifdef DEBUG_MODE
-#include "GlutStuff.h"
-#include "GLDebugDrawer.h"
-#include "btBulletDynamicsCommon.h"
-
-GLDebugDrawer	gDebugDrawer;
-#endif
-//****************************************
-
 #define RANDF (rand()%100)*0.01
 
 const std::string baseDir="../";
@@ -242,7 +230,7 @@ void displayWin()
     {
 
     	float temp=(std::clock()-lastTime)/50.0/(double)CLOCKS_PER_SEC*1000;
-    	std::cout << "Time per Frame = " << temp << std::endl;
+    	//std::cout << "Time per Frame = " << temp << std::endl;
     	lastTime=std::clock();
     }
     if (!stopCamera)
@@ -407,13 +395,10 @@ void processMouse(int button, int state, int x, int y)
 
 int main(int argc, char *argv[])
 {
-	
-#ifndef DEBUG_MODE
-
 	int wWidth=720;
 	int wHeight=480;
 
-	const char windowName[]="window";
+	const char windowName[]="Racing Game";
 	glutInit(&argc, argv);
     glutInitWindowSize(wWidth,wHeight);
     glutInitWindowPosition(10,10);
@@ -448,19 +433,6 @@ int main(int argc, char *argv[])
 	glutMouseFunc(processMouse);
     glutMainLoop();
     return 0;
-
-
-#else
-    std::cerr << "LOL";
-    int wWidth=720;
-	int wHeight=480;
-
-    camera = new Camera(vec3(0.0f,5.0f,-10.0f),vec3(0.0,0.0,0.0),wWidth,wHeight);
-    //init();
-    MainCar = new VehiclePhysic;
-    MainCar->getDynamicsWorld()->setDebugDrawer(&gDebugDrawer);
-	return glutmain(argc, argv,640,480,"Bullet Vehicle Demo. http://www.continuousphysics.com/Bullet/phpBB2/", MainCar);;
-#endif
 }
 
 void loadCar(int carNr)
