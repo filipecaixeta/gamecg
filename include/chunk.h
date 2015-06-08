@@ -11,7 +11,7 @@ public:
 	virtual ~Chunk();
 	void loadFile(string);
 	void playSound(int looping = ONCE, int channel = -1);
-	void stopSound(int);
+	void stopSound(int, bool isFadeOut = false);
 	int isPlaying(int);
 	void changeVolume(int, int);
 };

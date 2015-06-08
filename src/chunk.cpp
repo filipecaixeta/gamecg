@@ -22,9 +22,12 @@ int Chunk::isPlaying(int channel) {
 	return Mix_Playing(channel);
 }
 
-void Chunk::stopSound(int channel)
+void Chunk::stopSound(int channel, bool isFadeOut)
 {
-	Mix_HaltChannel(channel);
+	if(isFadeOut)
+		Mix_FadeOutChannel(channel, 1000);
+	else
+		Mix_HaltChannel(channel);
 }
 
 void Chunk::changeVolume(int channel, int volume)

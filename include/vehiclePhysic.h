@@ -127,6 +127,7 @@ private:
 
 	void CreateVehicle(Car *car);
 	void CreateVehicle();
+	void ManageSounds();
 	btRigidBody*	localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape);
 
 

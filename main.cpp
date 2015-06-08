@@ -468,7 +468,7 @@ void idle()
 void changeMusic()
 {
 	songNumber++;
-	if(songNumber == 3)
+	if(songNumber == 4)
 		songNumber = 1;
 	music.stopSound();
 	changeStation.playSound(ONCE, 1);
